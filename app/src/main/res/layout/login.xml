@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/white"
+                android:padding="20dip">
+
+    <LinearLayout
+        android:id="@+id/content_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/username_edit"
+            style="@style/normalText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_draw_bg"
+            android:drawableLeft="@drawable/icon_man"
+            android:drawablePadding="10dp"
+            android:hint="@string/login_username_hint"
+            android:inputType="textCapCharacters"
+            android:paddingLeft="10dip"
+            android:singleLine="true"/>
+
+        <EditText
+            android:id="@+id/password_edit"
+            style="@style/normalText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edit_draw_bg"
+            android:drawableLeft="@drawable/icon_lock"
+            android:drawablePadding="10dp"
+            android:hint="@string/login_password_hint"
+            android:inputType="numberPassword"
+            android:paddingLeft="10dip"
+            android:singleLine="true"/>
+
+        <CheckBox
+            android:layout_marginLeft="5dp"
+            android:id="@+id/cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:button="@drawable/checkselect_draw_bg"
+            android:checked="false"
+            android:paddingLeft="5dip"
+            android:text="@string/login_remember_password"
+            android:textColor="@color/grey">
+        </CheckBox>
+
+    </LinearLayout>
+
+    <!-- 登录button -->
+
+    <Button
+        android:id="@+id/login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/content_layout"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/shape"
+        android:text="@string/login_label_signin"/>
+
+    <TextView
+        android:id="@+id/detail_branch_name"
+        style="@style/valueText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/login_button"
+        android:layout_marginTop="10dp"
+        android:text="@string/login_label_version"
+        android:textSize="14sp"/>
+
+    <ImageView
+        android:layout_marginRight="10dp"
+        android:id="@+id/miniTwitter_logo"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/login_logo"/>
+
+</RelativeLayout>

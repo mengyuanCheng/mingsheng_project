@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/qcode_title"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#3695E2"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/qcode_bt_scan"
+                style="@style/buttonText"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:background="#3695E2"
+                android:text="@string/scan"/>
+
+            <TextView
+                android:id="@+id/textView"
+                style="@style/titleBarText"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:text="@string/peixiang"/>
+
+            <Button
+                android:id="@+id/qcode_bt_stop"
+                style="@style/buttonText"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:background="#3695E2"
+                android:text="@string/stop"
+                tools:ignore="RelativeOverlap"/>
+
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/list_qcdoe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:dividerHeight="8dp">
+
+        </ListView>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/qcode_update_bt"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="上传数据"/>
+    </RelativeLayout>
+
+
+</RelativeLayout>

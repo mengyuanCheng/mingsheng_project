@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/title_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:background="#3695E2"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/peixiangdetail_btn_back"
+            style="@style/buttonText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:background="#3695E2"
+            android:text="@string/button_back" />
+
+        <TextView
+            android:id="@+id/peixiangdetail_title_view"
+            style="@style/titleBarText"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/detail_title" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/peixiangdetail_btn_commit"
+        style="@style/buttonText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="5dp"
+        android:background="#FB7F2C"
+        android:text="@string/button_operate_2" />
+
+    <Button
+        android:id="@+id/peixiangdetail_btn_saomiao"
+        style="@style/buttonText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_operate_4"
+        android:layout_above="@+id/peixiangdetail_tv_num"
+        android:layout_alignRight="@+id/peixiangdetail_remark"
+        android:layout_alignEnd="@+id/peixiangdetail_remark"
+        android:layout_marginRight="67dp"
+        android:layout_marginEnd="67dp" />
+
+    <Button
+        android:id="@+id/peixiangdetail_btn_lianjie"
+        style="@style/buttonText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_operate_3"
+        android:layout_below="@+id/title_layout"
+        android:layout_toRightOf="@+id/textView1"
+        android:layout_toEndOf="@+id/textView1" />
+
+    <TextView
+        android:id="@+id/textView1"
+        style="@style/timesText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/peixiangdetail_tv_name"
+        android:layout_alignBottom="@+id/peixiangdetail_tv_name"
+        android:layout_alignParentLeft="true"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="配箱人员" />
+
+    <TextView
+        android:id="@+id/peixiangdetail_tv_name"
+        style="@style/timesText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/peixiangdetail_btn_lianjie"
+        android:layout_below="@+id/peixiangdetail_btn_lianjie"
+        android:gravity="center"
+        android:padding="10dp"
+        android:layout_alignRight="@+id/peixiangdetail_btn_lianjie"
+        android:layout_alignEnd="@+id/peixiangdetail_btn_lianjie" />
+
+    <TextView
+        android:id="@+id/peixiangdetail_tv_num"
+        style="@style/timesText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/peixiangdetail_tv_number"
+        android:layout_alignBottom="@+id/peixiangdetail_tv_number"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/peixiangdetail_tv_number"
+        android:gravity="center"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/peixiangdetail_tv_number"
+        style="@style/timesText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/peixiangdetail_tv_name"
+        android:layout_alignBottom="@+id/peixiangdetail_tv_name"
+        android:layout_alignRight="@+id/peixiangdetail_btn_saomiao"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="箱包号" />
+
+    <ListView
+        android:id="@+id/peixiang_ListView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/peixiangdetail_remark"
+        android:layout_below="@+id/textView1"
+        android:divider="#F2F5F7"
+        android:dividerHeight="1dp" />
+    <EditText
+        android:id="@+id/peixiangdetail_remark"
+        style="@style/normalText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/peixiangdetail_btn_commit"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="5dp"
+        android:background="#F4F4F4"
+        android:ems="10"
+        android:gravity="left|top"
+        android:hint="@string/detail_remark_hint"
+        android:inputType="textMultiLine"
+        android:minLines="2" />
+
+</RelativeLayout>
