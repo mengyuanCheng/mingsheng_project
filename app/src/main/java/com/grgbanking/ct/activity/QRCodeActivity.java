@@ -51,6 +51,7 @@ public class QRCodeActivity extends Activity {
      */
     private static final String FILE_FORMAT = ".txt";
     /**
+     * 1
      * 定义文件路径
      */
     private static final String FILE_PATH = "/sdcard/Download/";
@@ -82,7 +83,7 @@ public class QRCodeActivity extends Activity {
             byte[] barcode = intent.getByteArrayExtra("barcode");
             int barocodelen = intent.getIntExtra("length", 0);
             byte temp = intent.getByteExtra("barcodeType", (byte) 0);
-            android.util.Log.i("debug", "----codetype--" + temp);
+            Log.i("debug", "----codetype--" + temp);
             barcodeStr = new String(barcode, 0, barocodelen);
             String barcodeStr = intent.getStringExtra("barcode_string");//直接获取字符串
             showScanResult.setText(barcodeStr);
@@ -104,7 +105,6 @@ public class QRCodeActivity extends Activity {
         super.onCreate(savedInstanceState);
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.sacn_activity);
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         setupView();
     }
@@ -183,13 +183,14 @@ public class QRCodeActivity extends Activity {
 
     /**
      * 退出时弹出dialog
+     *
      * @param keyCode
      * @param event
      * @return
      */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK&&event.getRepeatCount()==0) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
             dialog();
         }
         return super.onKeyDown(keyCode, event);
@@ -198,7 +199,7 @@ public class QRCodeActivity extends Activity {
     /**
      * 提示是否需要提交并做相应的跳转
      */
-    protected void dialog(){
+    protected void dialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(QRCodeActivity.this);
         builder.setMessage("是否提交？");
         builder.setTitle("提示");

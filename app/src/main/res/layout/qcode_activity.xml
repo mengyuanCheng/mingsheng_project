@@ -8,6 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/qcode_linear_bottom"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -51,24 +52,37 @@
         <ListView
             android:id="@+id/list_qcdoe"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:dividerHeight="8dp">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:dividerHeight="2dp">
 
         </ListView>
 
     </LinearLayout>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/qcode_linear_bottom"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:layout_weight="4"
+            android:textColor="@color/white"
+            android:id="@+id/save_btn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="保存"/>
 
         <Button
             android:id="@+id/qcode_update_bt"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_weight="1"
             android:text="上传数据"/>
-    </RelativeLayout>
+    </LinearLayout>
 
 
 </RelativeLayout>

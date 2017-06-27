@@ -12,6 +12,7 @@ import com.hlct.framework.business.message.entity.PdaLoginMessage;
 public class ResultInfo implements java.io.Serializable{
 
 
+
     //	private JSONArray jsonArray;
     //	private JSONObject jsonObject = new JSONObject();
     /** 序列化 必须和服务端保持一致*/

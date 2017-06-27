@@ -2,7 +2,6 @@ package com.grgbanking.ct.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
@@ -75,7 +74,7 @@ public class LoginActivity extends Activity {
     /**
      * 弹出更新提示框  ,如果取消更新，刚退出APP
      */
-    AlertDialog.Builder update_version;
+    Builder update_version;
     ProgressDialog pd;
     /**
      * 判断新版本的URL是否为空，如果不为空，说明有新版本，提示用户更新中

@@ -4,9 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.grgbanking.ct.entity.ConvoyManInfo;
 import com.grgbanking.ct.entity.PeiXiangInfo;
 import com.grgbanking.ct.scan.Recordnet;
@@ -110,19 +111,36 @@ public class DBManager {
         }
     }
 
-    public void addPeiXiang(List<PeiXiangInfo> peiXiangInfos){
+    public void cleanPeiXiang(){
+//        db.beginTransaction();
+        db = helper.getWritableDatabase();
+        if(queryPeiXiang().isEmpty()){
+            return;
+        }
+        db.execSQL("DELETE FROM "+ DBHelper.TABLE_PeiXiangInfo_NAME );
+    }
+
+    public boolean addPeiXiang(List<PeiXiangInfo> peiXiangInfos){
+        Gson gson = new Gson();
+//                db.beginTransaction();//开始事物
+        boolean isSaved = true;
         try {
             ContentValues values = new ContentValues();
             for (PeiXiangInfo px :peiXiangInfos){
+                db = helper.getWritableDatabase();
                 values.put("BoxNum", px.getBoxNum());
                 values.put("scanningDate",px.getScanningDate());
                 values.put("QR_code", px.getQR_code());
+                values.put("QR_codelist",gson.toJson(px.getQR_codelist()));
                 db.insert(DBHelper.TABLE_PeiXiangInfo_NAME, null, values);
                 db.close();
+                isSaved = true;
             }
         }catch (Exception e){
             e.printStackTrace();
+            isSaved = false;
         }
+        return isSaved;
     }
 
 
@@ -719,9 +737,10 @@ public class DBManager {
         return maxId;
     }
 
-    public List<PeiXiangInfo> queryPeiXiang(){
+    public ArrayList<PeiXiangInfo> queryPeiXiang(){
         SQLiteDatabase db = helper.getReadableDatabase();
-        ArrayList<PeiXiangInfo> peiXiangInfoArrayList = new ArrayList<PeiXiangInfo>();
+        Gson gson = new Gson();
+        ArrayList<PeiXiangInfo> peiXiangInfoArrayList = new ArrayList<>();
         Cursor c = db.rawQuery("SELECT * FROM PeiXiang", null);
         c.moveToFirst();
         if (c != null) {
@@ -731,10 +750,11 @@ public class DBManager {
                     String BoxNum = c.getString(0);
                     String scanningDate = c.getString(1);
                     String QR_code = c.getString(2);
-
+                    ArrayList<String> mList = gson.fromJson(c.getString(3),new TypeToken<ArrayList<String>>(){}.getType());
                     px.setBoxNum(BoxNum);
                     px.setScanningDate(scanningDate);
                     px.setQR_code(QR_code);
+                    px.setQR_codelist(mList);
                     peiXiangInfoArrayList.add(px);
                 } while (c.moveToNext());
             }

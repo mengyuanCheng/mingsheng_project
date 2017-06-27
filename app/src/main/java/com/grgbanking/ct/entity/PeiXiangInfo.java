@@ -1,10 +1,7 @@
 package com.grgbanking.ct.entity;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author ：     cmy
@@ -18,6 +15,14 @@ public class PeiXiangInfo implements Serializable {
     private ArrayList<String> QR_codelist;
     private String QR_code;
     private String scanningDate;
+
+    public PeiXiangInfo (){
+
+    }
+    public PeiXiangInfo (String boxNum){
+        this.BoxNum = boxNum;
+    }
+
 
     public String getScanningDate() {
         return scanningDate;
@@ -51,8 +56,15 @@ public class PeiXiangInfo implements Serializable {
         this.QR_code = QR_code;
     }
 
-    public PeiXiangInfo (){
 
+
+    @Override
+    public String toString() {
+        return "PeiXiangInfo{" +
+                "BoxNum='" + BoxNum + '\'' +
+                ", QR_codelist=" + QR_codelist +
+                ", QR_code='" + QR_code + '\'' +
+                ", scanningDate='" + scanningDate + '\'' +
+                '}';
     }
-
 }

@@ -15,13 +15,14 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.grgbanking.ct.R;
 import com.grgbanking.ct.activity.MApplication;
-import com.grgbanking.ct.cach.DataCach;
 
 import java.util.ArrayList;
 
@@ -34,9 +35,11 @@ import java.util.ArrayList;
 
 public class ScanActivity extends Activity {
     private final static String SCAN_ACTION = "android.intent.ACTION_DECODE_DATA";
+    public static final int REQUEST_CODE_SCAN = 222;   //请求码
+    public static final int RESULT_CODE_SCAN = 333;    //返回码
     int count = 1;//保存按钮点击次数
     private Context context;
-    private EditText showScanResult;
+    private TextView showScanResult;
     private Button btn;
     private Button mScan;
     private Button mClose;
@@ -50,6 +53,12 @@ public class ScanActivity extends Activity {
     private boolean isScaning = false;
     private String rfidNum = "";
     private ArrayList<String> QRcodelist = new ArrayList();
+
+    /*----------------------------------------------------------*/
+    private ListView mListView;
+    private ArrayAdapter mArrayAdapter;
+    private ArrayList<String> mArrayList = new ArrayList<>();
+
     private BroadcastReceiver mScanReceiver = new BroadcastReceiver() {
 
         @Override
@@ -61,12 +70,21 @@ public class ScanActivity extends Activity {
             byte[] barcode = intent.getByteArrayExtra("barcode");
             int barocodelen = intent.getIntExtra("length", 0);
             byte temp = intent.getByteExtra("barcodeType", (byte) 0);
-            android.util.Log.i("debug", "----codetype--" + temp);
+            Log.i("debug", "----codetype--" + temp);
             barcodeStr = new String(barcode, 0, barocodelen);
 
             String barcodeStr = intent.getStringExtra("barcode_string");//直接获取字符串
-
             showScanResult.setText(barcodeStr);
+            if (mArrayList.contains(barcodeStr)) {
+                Toast.makeText(ScanActivity.this, "扫描结果已经存在", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                mArrayList.add(barcodeStr);
+                if (mArrayAdapter != null) {
+                    mArrayAdapter.notifyDataSetChanged();
+                }
+            }
+
         }
     };
     private Toast toast = null;
@@ -79,6 +97,7 @@ public class ScanActivity extends Activity {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.sacn_activity);
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        context  = ScanActivity.this;
         setupView();
         getInfo();
     }
@@ -92,12 +111,13 @@ public class ScanActivity extends Activity {
     }
 
     private void setupView() {
-        showScanResult = (EditText) findViewById(R.id.scan_result);
+        showScanResult = (TextView) findViewById(R.id.scan_result);
         btn = (Button) findViewById(R.id.manager);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                DataCach.codeMap.put("" + count, barcodeStr);
+                saveData();
+               /* DataCach.codeMap.put("" + count, barcodeStr);
                 DataCach.qcodeMap.put(rfidNum, DataCach.codeMap);
                 count++;
                 if (barcodeStr != null) {
@@ -112,7 +132,7 @@ public class ScanActivity extends Activity {
                 } else {
                     showTextToast("未检测到任何二维码数据，请重新扫描！");
                     //                    Toast.makeText(ScanActivity.this, "未检测到任何二维码数据，请重新扫描！", Toast.LENGTH_SHORT).show();
-                }
+                }*/
             }
         });
         mScan = (Button) findViewById(R.id.scan);
@@ -138,6 +158,24 @@ public class ScanActivity extends Activity {
                 mScanManager.stopDecode();
             }
         });
+
+        /*-----------------------------------------------------------*/
+        mListView = (ListView) findViewById(R.id.scan_listview);
+        mArrayAdapter = new ArrayAdapter(context,R.layout.array_listview_item_view,
+                R.id.array_listview_textview,mArrayList);
+        mListView.setAdapter(mArrayAdapter);
+
+    }
+    /*
+    * 按保存按钮的时候
+    * */
+    private void saveData() {
+        Intent commitIntent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList("list", mArrayList);
+        commitIntent.putExtra("bundle", bundle);
+        this.setResult(RESULT_CODE_SCAN,commitIntent);
+        finish();
     }
 
     @Override

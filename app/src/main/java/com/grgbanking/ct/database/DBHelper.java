@@ -69,7 +69,8 @@ public class DBHelper extends SQLiteOpenHelper {
             TABLE_PeiXiangInfo_NAME +
             "(BoxNum VARCHAR,"+
             "scanningDate VARCHAR," +
-            "QR_code VARCHAR)";
+            "QR_code VARCHAR," +
+            "QR_codelist VARCHAR)";
 
     private String sql_create_ConvoyMan = "CREATE TABLE IF NOT EXISTS " +
             TABLE_ConvoyMan_NAME +

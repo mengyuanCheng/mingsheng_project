@@ -42,39 +42,42 @@
     <uses-feature android:name="android.hardware.camera"/>
     <uses-feature android:name="android.hardware.camera.autofocus"/>
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/app_icon"
         android:label="@string/app_name">
         <activity
-            android:name="com.grgbanking.ct.activity.LoginActivity"
+            android:name=".activity.LoginActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
-            android:name="com.grgbanking.ct.activity.MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"/>
         <activity
-            android:name="com.grgbanking.ct.activity.DetailActivity"
+            android:name=".activity.DetailActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateHidden|adjustResize"/>
         <activity
-            android:name="com.grgbanking.ct.page.CaptureActivity"
+            android:name=".page.CaptureActivity"
             android:label="@string/app_name"/>
         <activity
-            android:name="com.grgbanking.ct.activity.NetOutInActivity"
+            android:name=".activity.NetOutInActivity"
             android:label="@string/app_name"/>
         <activity
-            android:name="com.grgbanking.ct.activity.PeixiangActivity"
+            android:name=".activity.PeixiangActivity"
             android:label="@string/app_name"/>
         <activity
-            android:name="com.grgbanking.ct.activity.PeixiangdtActivity"
+            android:name=".activity.PeixiangdtActivity"
             android:label="@string/app_name"/>
         <activity
-            android:name="com.grgbanking.ct.qcode.QcodeActivity"
+            android:name=".qcode.QcodeActivity"
             android:label="华联创通"/>
         <activity
             android:name=".qcode.ScanActivity"
@@ -82,14 +85,16 @@
         <activity
             android:name=".qcode.StatActivity"
             android:label="华联创通"/>
-        <activity android:name=".activity.QRCodeActivity"
-                  android:label="华联创通"/>
+        <activity
+            android:name=".activity.QRCodeActivity"
+            android:label="华联创通"/>
 
-        <service android:name="com.grgbanking.ct.service.GrgbankService"/>
+        <service android:name=".service.GrgbankService"/>
 
-        <receiver android:name="com.grgbanking.ct.service.StartReceiver">
+        <receiver android:name=".service.StartReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </receiver>
@@ -102,6 +107,9 @@
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="nhbFfNwcxy5gzz7Tn8GbvaeK"/>
+
+        <activity android:name=".activity.ScanQRCodeActivity">
+        </activity>
     </application>
 
 </manifest>
