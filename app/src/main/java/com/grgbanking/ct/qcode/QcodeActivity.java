@@ -362,7 +362,7 @@ public class QcodeActivity extends Activity {
         FileUtil.strToByteArray(tmp);
         FileUtil.writeBytes(addr, writebytes);
         FileUtil.writeString(addr, tmp, "utf-8");
-
+        FileUtil.makeFileAvailable(context,addr);
         Toast.makeText(QcodeActivity.this, "数据上传成功！", Toast.LENGTH_SHORT).show();
 
         hideWaitDialog();

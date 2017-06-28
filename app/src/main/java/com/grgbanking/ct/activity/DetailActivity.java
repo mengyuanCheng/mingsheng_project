@@ -786,6 +786,7 @@ public class DetailActivity extends Activity {
             case NET_COMMIT_TYPE_OUT:
                 if (FileUtil.isExist(FILE_PATH + FILE_NAME_OUT + date + FILE_FORMAT)) {
                     msg = "true";
+                    FileUtil.makeFileAvailable(context,FILE_PATH + FILE_NAME_OUT + date + FILE_FORMAT);
                 } else {
                     msg = "文件生成有误，请重新交接";
                 }
@@ -793,6 +794,7 @@ public class DetailActivity extends Activity {
             case NET_COMMIT_TYPE_IN:
                 if (FileUtil.isExist(FILE_PATH + FILE_NAME_IN + date + FILE_FORMAT)) {
                     msg = "true";
+                    FileUtil.makeFileAvailable(context,FILE_PATH + FILE_NAME_IN + date + FILE_FORMAT);
                 } else {
                     msg = "文件生成有误，请重新交接";
                 }

@@ -1,5 +1,8 @@
 package com.grgbanking.ct.utils;
 
+import android.content.Context;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.util.Log;
 
 import com.hlct.framework.pda.common.entity.ResultInfo;
@@ -227,5 +230,23 @@ public class FileUtil {
         }
         return isImageFile;
     }
+
+    /**
+     *
+     * @param context  传入activity
+     * @param file     传入file 对象
+     *
+     */
+    public static void makeFileAvailable (Context context, String filePath)
+    {
+        MediaScannerConnection.scanFile(context, new String[] { filePath }, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri){
+                        Log.d("context", "File scanned" + path);
+                    }
+                });
+
+    }
+
 
 }
