@@ -121,7 +121,7 @@ public class QcodeActivity extends Activity {
             mArrayAdapter = new ArrayAdapter(context, R.layout.array_listview_item_view,
                     R.id.array_listview_textview, mRFIDCodes);
             mListView.setAdapter(mArrayAdapter);
-        }catch ( Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -138,16 +138,16 @@ public class QcodeActivity extends Activity {
 
                 if (peiXiangInfos != null && peiXiangInfos.size() >= position + 1) {
                     PeiXiangInfo peiXiangInfo = peiXiangInfos.get(position);
-                    Intent intent = new Intent(context,ScanQRCodeActivity.class);
+                    Intent intent = new Intent(context, ScanQRCodeActivity.class);
                     //如果列表中没有数据,就不传过去,否则会造成空指针
-                    if(peiXiangInfo.getQR_codelist() != null) {
+                    if (peiXiangInfo.getQR_codelist() != null) {
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("list", peiXiangInfo.getQR_codelist());
                         intent.putExtra("bundle", bundle);
                     }
                     intent.addFlags(position);
                     startActivityForResult(intent, REQUEST_CODE);
-                }else {
+                } else {
                     Intent intent = new Intent(context, ScanQRCodeActivity.class);
                     intent.addFlags(position);
                     startActivityForResult(intent, REQUEST_CODE);
@@ -199,7 +199,7 @@ public class QcodeActivity extends Activity {
         List<PeiXiangInfo> peiXiangInfoList = new ArrayList<PeiXiangInfo>();
         DBManager dbdb = new DBManager(this);
         peiXiangInfos = dbdb.queryPeiXiang();
-        for(int i =0; i < peiXiangInfos.size(); i++){
+        for (int i = 0; i < peiXiangInfos.size(); i++) {
             mRFIDCodes.add(peiXiangInfos.get(i).getBoxNum());
         }
         /*for (int i = 0; i < peiXiangInfoList.size(); i++) {
@@ -297,10 +297,10 @@ public class QcodeActivity extends Activity {
                         .setPositiveButton("确认上传", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                             //TODO 从数据库读到数据,并生成文件
+                                //TODO 从数据库读到数据,并生成文件
                                 commitData();
                             }
-                        }).setNegativeButton("取消上传",null)
+                        }).setNegativeButton("取消上传", null)
                         .show();
 
             }
@@ -321,14 +321,19 @@ public class QcodeActivity extends Activity {
         sb.append("{").append("GUARD_CODE:").append(loginUser.getLoginName()).append(",BOXRFIDQR: [");
         DBManager dbManager = new DBManager(this);
         ArrayList<PeiXiangInfo> arrayList = dbManager.queryPeiXiang();
-        for(PeiXiangInfo px : arrayList){
-            String temp = px.getQR_codelist().toString();
-            Log.i("====tmp1==", "" + temp);
-            String tmp2 = temp.replaceAll(", ", "|");
-            Log.i("====tmp2==", "" + tmp2);
-            String tmp3 = tmp2.substring(1, tmp2.length() - 1);
-            Log.i("tmp3===", "" + tmp3);
-            sb.append("{BOXRFID:").append(px.getBoxNum()).append(",QRCODE:").append(tmp3).append("},");
+        for (PeiXiangInfo px : arrayList) {
+            if (px.getQR_codelist() != null) {
+                String temp = px.getQR_codelist().toString();
+                Log.i("====tmp1==", "" + temp);
+                String tmp2 = temp.replaceAll(", ", "|");
+                Log.i("====tmp2==", "" + tmp2);
+                String tmp3 = tmp2.substring(1, tmp2.length() - 1);
+                Log.i("tmp3===", "" + tmp3);
+                sb.append("{BOXRFID:").append(px.getBoxNum()).append(",QRCODE:").append(tmp3).append("},");
+            }else {
+                sb.append("{BOXRFID:").append(px.getBoxNum()).append(",QRCODE:").append("").append("},");
+            }
+
         }
 
         /*Set keyset = reFreshDataMap.keySet();
@@ -353,7 +358,7 @@ public class QcodeActivity extends Activity {
         ri.setText(tmp);
         Log.i("====tmp==", "" + tmp);
 
-         //将数据写入SD卡
+        //将数据写入SD卡
 
         String date = FileUtil.getDate();
         String addr = FileUtil.createIfNotExist(FILE_PATH + FILE_NAME + date + FILE_FORMAT);
@@ -362,7 +367,7 @@ public class QcodeActivity extends Activity {
         FileUtil.strToByteArray(tmp);
         FileUtil.writeBytes(addr, writebytes);
         FileUtil.writeString(addr, tmp, "utf-8");
-        FileUtil.makeFileAvailable(context,addr);
+        FileUtil.makeFileAvailable(context, addr);
         Toast.makeText(QcodeActivity.this, "数据上传成功！", Toast.LENGTH_SHORT).show();
 
         hideWaitDialog();
