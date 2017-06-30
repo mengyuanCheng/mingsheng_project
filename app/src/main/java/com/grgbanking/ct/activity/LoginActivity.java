@@ -640,6 +640,9 @@ public class LoginActivity extends Activity {
                     databaseLogin();
                     loginButtonView.setEnabled(true);
                     loginButtonView.setText("登录");
+                    if (waitingDialog.isShowing()) {
+                        waitingDialog.dismiss();
+                    }
                     break;
                 }
             }

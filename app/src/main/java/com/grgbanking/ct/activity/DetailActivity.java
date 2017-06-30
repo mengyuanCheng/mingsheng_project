@@ -186,7 +186,7 @@ public class DetailActivity extends Activity {
         deviceListView = (ListView) findViewById(R.id.ListView_boxs);
 
         // 生成动态数组，加入数据
-        listItem = new ArrayList<HashMap<String, Object>>();
+        listItem = new ArrayList<>();
         // 生成适配器的Item和动态数组对应的元素
         listItemAdapter = new SimpleAdapter(
                 this,

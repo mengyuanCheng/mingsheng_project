@@ -88,28 +88,28 @@ public class DBManager {
         }
     }
 
-    /**
-     * add LoginMan
-     *
-     * @param loginMen
-     */
-    public void addLoginMan(List<PdaUserInfo> loginMen) {
-        try {
-            ContentValues values = new ContentValues();
-            for (PdaUserInfo loginMan : loginMen) {
-                db = helper.getWritableDatabase();
-                values.put("loginId", loginMan.getLoginId());
-                values.put("loginName", loginMan.getLogin_name());
-                values.put("password", loginMan.getPassword());
-                values.put("flag", loginMan.getFlag());
-                values.put("line", loginMan.getLine());
-                db.insert(DBHelper.TABLE_LoginMan_NAME, null, values);
-                db.close();
+        /**
+         * add LoginMan
+         *
+         * @param loginMen
+         */
+        public void addLoginMan(List<PdaUserInfo> loginMen) {
+            try {
+                ContentValues values = new ContentValues();
+                for (PdaUserInfo loginMan : loginMen) {
+                    db = helper.getWritableDatabase();
+                    values.put("loginId", loginMan.getLoginId());
+                    values.put("loginName", loginMan.getLogin_name());
+                    values.put("password", loginMan.getPassword());
+                    values.put("flag", loginMan.getFlag());
+                    values.put("line", loginMan.getLine());
+                    db.insert(DBHelper.TABLE_LoginMan_NAME, null, values);
+                    db.close();
+                }
+            } finally {
+                //            db.endTransaction();//结束事物
             }
-        } finally {
-            //            db.endTransaction();//结束事物
         }
-    }
 
     public void cleanPeiXiang(){
 //        db.beginTransaction();
