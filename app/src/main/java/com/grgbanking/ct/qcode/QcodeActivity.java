@@ -44,9 +44,6 @@ import static com.grgbanking.ct.rfid.UfhData.timer;
  * @e-mil ：      mengyuan.cheng.mier@gmail.com
  * @Description :
  */
-// FIXME: 2017/2/16 停止扫描后，再次扫描时不允许重复的RFID被添加
-// TODO: 2017/4/7 首次运行是检查数据库是否存在当天的数据。if{存在,从数据库中取出数据并展示},if{不存在,扫描数据}
-// TODO: 2017/4/7 最后,将新增的数据保存到数据库中。
 public class QcodeActivity extends Activity {
     /**
      * 定义文件路径
@@ -297,7 +294,6 @@ public class QcodeActivity extends Activity {
                         .setPositiveButton("确认上传", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                //TODO 从数据库读到数据,并生成文件
                                 commitData();
                             }
                         }).setNegativeButton("取消上传", null)

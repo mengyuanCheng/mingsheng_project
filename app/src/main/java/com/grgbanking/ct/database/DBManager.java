@@ -88,55 +88,55 @@ public class DBManager {
         }
     }
 
-        /**
-         * add LoginMan
-         *
-         * @param loginMen
-         */
-        public void addLoginMan(List<PdaUserInfo> loginMen) {
-            try {
-                ContentValues values = new ContentValues();
-                for (PdaUserInfo loginMan : loginMen) {
-                    db = helper.getWritableDatabase();
-                    values.put("loginId", loginMan.getLoginId());
-                    values.put("loginName", loginMan.getLogin_name());
-                    values.put("password", loginMan.getPassword());
-                    values.put("flag", loginMan.getFlag());
-                    values.put("line", loginMan.getLine());
-                    db.insert(DBHelper.TABLE_LoginMan_NAME, null, values);
-                    db.close();
-                }
-            } finally {
-                //            db.endTransaction();//结束事物
+    /**
+     * add LoginMan
+     *
+     * @param loginMen
+     */
+    public void addLoginMan(List<PdaUserInfo> loginMen) {
+        try {
+            ContentValues values = new ContentValues();
+            for (PdaUserInfo loginMan : loginMen) {
+                db = helper.getWritableDatabase();
+                values.put("loginId", loginMan.getLoginId());
+                values.put("loginName", loginMan.getLogin_name());
+                values.put("password", loginMan.getPassword());
+                values.put("flag", loginMan.getFlag());
+                values.put("line", loginMan.getLine());
+                db.insert(DBHelper.TABLE_LoginMan_NAME, null, values);
+                db.close();
             }
+        } finally {
+            //            db.endTransaction();//结束事物
         }
-
-    public void cleanPeiXiang(){
-//        db.beginTransaction();
-        db = helper.getWritableDatabase();
-        if(queryPeiXiang().isEmpty()){
-            return;
-        }
-        db.execSQL("DELETE FROM "+ DBHelper.TABLE_PeiXiangInfo_NAME );
     }
 
-    public boolean addPeiXiang(List<PeiXiangInfo> peiXiangInfos){
+    public void cleanPeiXiang() {
+        //        db.beginTransaction();
+        db = helper.getWritableDatabase();
+        if (queryPeiXiang().isEmpty()) {
+            return;
+        }
+        db.execSQL("DELETE FROM " + DBHelper.TABLE_PeiXiangInfo_NAME);
+    }
+
+    public boolean addPeiXiang(List<PeiXiangInfo> peiXiangInfos) {
         Gson gson = new Gson();
-//                db.beginTransaction();//开始事物
+        //                db.beginTransaction();//开始事物
         boolean isSaved = true;
         try {
             ContentValues values = new ContentValues();
-            for (PeiXiangInfo px :peiXiangInfos){
+            for (PeiXiangInfo px : peiXiangInfos) {
                 db = helper.getWritableDatabase();
                 values.put("BoxNum", px.getBoxNum());
-                values.put("scanningDate",px.getScanningDate());
+                values.put("scanningDate", px.getScanningDate());
                 values.put("QR_code", px.getQR_code());
-                values.put("QR_codelist",gson.toJson(px.getQR_codelist()));
+                values.put("QR_codelist", gson.toJson(px.getQR_codelist()));
                 db.insert(DBHelper.TABLE_PeiXiangInfo_NAME, null, values);
                 db.close();
                 isSaved = true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             isSaved = false;
         }
@@ -262,21 +262,21 @@ public class DBManager {
             values.put("lineSn", recordnet.getLineSn());
             values.put("scanningDate", recordnet.getScanningDate());
             values.put("bankman", recordnet.getBankman());
-            values.put("bankman2",recordnet.getBankman2());
+            values.put("bankman2", recordnet.getBankman2());
             values.put("guardman", recordnet.getGuardman());
-            values.put("guardman2",recordnet.getGuardman2());
+            values.put("guardman2", recordnet.getGuardman2());
             values.put("lineType", recordnet.getLineType());
             values.put("scanStatus", recordnet.getScanStatus());
             values.put("note", recordnet.getNote());
             values.put("bankId", recordnet.getBankId());
             values.put("bankmanId", recordnet.getBankmanId());
-            values.put("bankmanId2",recordnet.getBankmanId2());
+            values.put("bankmanId2", recordnet.getBankmanId2());
             values.put("guardmanId", recordnet.getGuardmanId());
-            values.put("guardmanId2",recordnet.getGuardmanId2());
+            values.put("guardmanId2", recordnet.getGuardmanId2());
             values.put("lineId", recordnet.getLineId());
             db.insert(DBHelper.TABLE_RECORDNET_NAME, null, values);
             db.close();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -343,7 +343,7 @@ public class DBManager {
             values.put("bankId", extractBoxs.getBankId());
             values.put("boxSn", extractBoxs.getBoxSn());
             db.insert(DBHelper.TABLE_EXTRACTBOXS_NAME, null, values);
-//            db.close();
+            //            db.close();
         } finally {
 
         }
@@ -606,6 +606,34 @@ public class DBManager {
     }
 
     /**
+     * 根据RFID查询款箱名称
+     *
+     * @param rfidNum
+     * @return boxList
+     */
+    public List<PdaCashboxInfo> queryCashBoxName(String rfidNum) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        ArrayList<PdaCashboxInfo> boxList = new ArrayList<>();
+        Cursor c = db.rawQuery("SELECT * FROM PdaCashboxInfo where rfidNum = ?", new String[]{rfidNum});
+        c.moveToFirst();
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    PdaCashboxInfo box = new PdaCashboxInfo();
+                    String boxRfidNum = c.getString(0);
+                    String boxBankId = c.getString(2);
+                    String boxSn = c.getString(3);
+                    box.setRfidNum(boxRfidNum);
+                    box.setBankId(boxBankId);
+                    box.setBoxSn(boxSn);
+                    boxList.add(box);
+                } while (c.moveToNext());
+            }
+        }
+        return boxList;
+    }
+
+    /**
      * 查询所有款箱
      *
      * @return ArrayList<CashBox>
@@ -737,7 +765,7 @@ public class DBManager {
         return maxId;
     }
 
-    public ArrayList<PeiXiangInfo> queryPeiXiang(){
+    public ArrayList<PeiXiangInfo> queryPeiXiang() {
         SQLiteDatabase db = helper.getReadableDatabase();
         Gson gson = new Gson();
         ArrayList<PeiXiangInfo> peiXiangInfoArrayList = new ArrayList<>();
@@ -750,7 +778,8 @@ public class DBManager {
                     String BoxNum = c.getString(0);
                     String scanningDate = c.getString(1);
                     String QR_code = c.getString(2);
-                    ArrayList<String> mList = gson.fromJson(c.getString(3),new TypeToken<ArrayList<String>>(){}.getType());
+                    ArrayList<String> mList = gson.fromJson(c.getString(3), new TypeToken<ArrayList<String>>() {
+                    }.getType());
                     px.setBoxNum(BoxNum);
                     px.setScanningDate(scanningDate);
                     px.setQR_code(QR_code);
@@ -772,7 +801,7 @@ public class DBManager {
     public void delete() {
         try {
             db = helper.getWritableDatabase();
-            db.delete(DBHelper.TABLE_LoginMan_NAME,null,null);
+            db.delete(DBHelper.TABLE_LoginMan_NAME, null, null);
             db.delete(DBHelper.TABLE_ConvoyMan_NAME, null, null);
             db.delete(DBHelper.TABLE_NetMan_NAME, null, null);
             db.delete(DBHelper.TABLE_NetTask_NAME, null, null);
