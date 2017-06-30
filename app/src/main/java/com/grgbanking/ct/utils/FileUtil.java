@@ -35,7 +35,7 @@ public class FileUtil {
     public static boolean isExist(String path) {
         File file = new File(path);
         boolean status = file.exists();
-        Log.d("isExist",""+status);
+        Log.d("isExist", "" + status);
         return status;
     }
 
@@ -232,16 +232,13 @@ public class FileUtil {
     }
 
     /**
-     *
      * @param context  传入activity
-     * @param file     传入file 对象
-     *
+     * @param filePath 传入file对象的文件路径
      */
-    public static void makeFileAvailable (Context context, String filePath)
-    {
-        MediaScannerConnection.scanFile(context, new String[] { filePath }, null,
+    public static void makeFileAvailable(Context context, String filePath) {
+        MediaScannerConnection.scanFile(context, new String[]{filePath}, null,
                 new MediaScannerConnection.OnScanCompletedListener() {
-                    public void onScanCompleted(String path, Uri uri){
+                    public void onScanCompleted(String path, Uri uri) {
                         Log.d("context", "File scanned" + path);
                     }
                 });

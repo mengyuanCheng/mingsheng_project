@@ -1,11 +1,14 @@
 package com.grgbanking.ct.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -35,14 +38,13 @@ public class ScanQRCodeActivity extends Activity implements View.OnClickListener
         setContentView(R.layout.activity_scan_qrcode);
         Intent intent = getIntent();
         mFlag = intent.getFlags();
+
         if(intent.getBundleExtra("bundle") != null){
             Bundle bundle = intent.getBundleExtra("bundle");
             mArrayList = (ArrayList<String>) bundle.getSerializable("list");
             if(mArrayList != null){
                 Log.i("ScanQRCodeActivity->",mArrayList.toString());
             }
-
-
         }
 
         mContext = ScanQRCodeActivity.this;
@@ -55,6 +57,31 @@ public class ScanQRCodeActivity extends Activity implements View.OnClickListener
         mArrayAdapter = new ArrayAdapter(mContext,R.layout.array_listview_item_view,
                 R.id.array_listview_textview,mArrayList);
         mListView.setAdapter(mArrayAdapter);
+
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view,final int position, long id) {
+
+                new AlertDialog.Builder(mContext)
+                        .setTitle("提示")
+                        .setMessage("删除该钱捆?")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mArrayList.remove(position);
+                                mArrayAdapter.notifyDataSetChanged();
+                            }
+                        })
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .show();
+                return false;
+            }
+        });
 
 
 
@@ -98,7 +125,7 @@ public class ScanQRCodeActivity extends Activity implements View.OnClickListener
                     ArrayList<String> list = bundle.getStringArrayList("list");
                     assert list != null;
                     for (String s : list) {
-                        if (!mArrayList.contains(s) && mArrayList.size() <= 5) {
+                        if (!mArrayList.contains(s)) {
                             mArrayList.add(s);
                         }
                     }

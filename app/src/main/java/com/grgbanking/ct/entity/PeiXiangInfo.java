@@ -11,15 +11,21 @@ import java.util.ArrayList;
  */
 
 public class PeiXiangInfo implements Serializable {
-    private String BoxNum;
+    private String BoxNum;     //扫描到的rfid;
     private ArrayList<String> QR_codelist;
-    private String QR_code;
+    private String boxName;    //根据boxNum查询到的配箱名
     private String scanningDate;
 
     public PeiXiangInfo (){
 
     }
+
     public PeiXiangInfo (String boxNum){
+        this.BoxNum = boxNum;
+    }
+
+    public PeiXiangInfo(String boxNum,String boxName){
+        this.boxName = boxName;
         this.BoxNum = boxNum;
     }
 
@@ -48,22 +54,20 @@ public class PeiXiangInfo implements Serializable {
         this.QR_codelist = QR_codelist;
     }
 
-    public String getQR_code() {
-        return QR_code;
+    public String getBoxName() {
+        return boxName;
     }
 
-    public void setQR_code(String QR_code) {
-        this.QR_code = QR_code;
+    public void setBoxName(String boxName) {
+        this.boxName = boxName;
     }
-
-
 
     @Override
     public String toString() {
         return "PeiXiangInfo{" +
                 "BoxNum='" + BoxNum + '\'' +
                 ", QR_codelist=" + QR_codelist +
-                ", QR_code='" + QR_code + '\'' +
+                ", boxName='" + boxName + '\'' +
                 ", scanningDate='" + scanningDate + '\'' +
                 '}';
     }

@@ -130,7 +130,7 @@ public class DBManager {
                 db = helper.getWritableDatabase();
                 values.put("BoxNum", px.getBoxNum());
                 values.put("scanningDate", px.getScanningDate());
-                values.put("QR_code", px.getQR_code());
+                values.put("boxName", px.getBoxName());
                 values.put("QR_codelist", gson.toJson(px.getQR_codelist()));
                 db.insert(DBHelper.TABLE_PeiXiangInfo_NAME, null, values);
                 db.close();
@@ -608,29 +608,18 @@ public class DBManager {
     /**
      * 根据RFID查询款箱名称
      *
-     * @param rfidNum
-     * @return boxList
+     * @param rfidNum   rfid号
+     * @return boxName
      */
-    public List<PdaCashboxInfo> queryCashBoxName(String rfidNum) {
+    public String queryCashBoxName(String rfidNum) {
+        String boxName ="";
         SQLiteDatabase db = helper.getReadableDatabase();
-        ArrayList<PdaCashboxInfo> boxList = new ArrayList<>();
         Cursor c = db.rawQuery("SELECT * FROM PdaCashboxInfo where rfidNum = ?", new String[]{rfidNum});
-        c.moveToFirst();
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    PdaCashboxInfo box = new PdaCashboxInfo();
-                    String boxRfidNum = c.getString(0);
-                    String boxBankId = c.getString(2);
-                    String boxSn = c.getString(3);
-                    box.setRfidNum(boxRfidNum);
-                    box.setBankId(boxBankId);
-                    box.setBoxSn(boxSn);
-                    boxList.add(box);
-                } while (c.moveToNext());
-            }
-        }
-        return boxList;
+
+        boxName = c.getString(c.getColumnIndex("BoxSn"));
+
+        c.close();
+        return boxName;
     }
 
     /**
@@ -777,12 +766,12 @@ public class DBManager {
                     PeiXiangInfo px = new PeiXiangInfo();
                     String BoxNum = c.getString(0);
                     String scanningDate = c.getString(1);
-                    String QR_code = c.getString(2);
+                    String boxName = c.getString(2);
                     ArrayList<String> mList = gson.fromJson(c.getString(3), new TypeToken<ArrayList<String>>() {
                     }.getType());
                     px.setBoxNum(BoxNum);
                     px.setScanningDate(scanningDate);
-                    px.setQR_code(QR_code);
+                    px.setBoxName(boxName);
                     px.setQR_codelist(mList);
                     peiXiangInfoArrayList.add(px);
                 } while (c.moveToNext());
