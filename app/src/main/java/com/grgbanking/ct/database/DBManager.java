@@ -615,9 +615,9 @@ public class DBManager {
         String boxName ="";
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM PdaCashboxInfo where rfidNum = ?", new String[]{rfidNum});
-
-        boxName = c.getString(c.getColumnIndex("BoxSn"));
-
+        if(c.moveToFirst()){
+            boxName = c.getString(c.getColumnIndex("BoxSn"));
+        }
         c.close();
         return boxName;
     }

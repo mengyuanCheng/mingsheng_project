@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -21,9 +20,10 @@ import android.widget.Toast;
 import com.grgbanking.ct.R;
 import com.grgbanking.ct.activity.MApplication;
 import com.grgbanking.ct.activity.ScanQRCodeActivity;
+import com.grgbanking.ct.adapter.MyBaseAdapter;
+import com.grgbanking.ct.cach.DataCach;
 import com.grgbanking.ct.database.DBManager;
 import com.grgbanking.ct.entity.PeiXiangInfo;
-import com.grgbanking.ct.http.ResultInfo;
 import com.grgbanking.ct.rfid.UfhData;
 import com.grgbanking.ct.utils.FileUtil;
 
@@ -81,8 +81,8 @@ public class QcodeActivity extends Activity {
     private ArrayList<String> mRFIDCodes = new ArrayList<>();     //存放rfid的list
     private ArrayList<String> mBoxNameList = new ArrayList<>();   //配箱名列表
 
-    private ListView mListView;                  // listView   使用arrayAdapter
-    private ArrayAdapter mArrayAdapter;      // arrayAdapter
+    private ListView mListView;                  // listView   使用 自定义Adapter
+    MyBaseAdapter myBaseAdapter;                 // 为listview自定义的adapter
     public static final int REQUEST_CODE = 000;   //startactivityforresult 的请求码
     public static final int RESULT_CODE = 111;   //startactivityforresult 的返回码
 /*---------------------------------------------------------*/
@@ -119,11 +119,9 @@ public class QcodeActivity extends Activity {
         findViewById();
 
         init();
-        mArrayAdapter = new ArrayAdapter(context, R.layout.array_listview_item_view,
-                R.id.array_listview_textview, mBoxNameList);
-        mListView.setAdapter(mArrayAdapter);
 
-
+        myBaseAdapter = new MyBaseAdapter(context,peiXiangInfos);
+        mListView.setAdapter(myBaseAdapter);
         /*
         * 设置listview的item点击事件
         * 跳转到对应的扫描二维码的activity
@@ -153,41 +151,28 @@ public class QcodeActivity extends Activity {
 
             }
         });
-        onClickListener();
-
-        /*listitem = new ArrayList<Map<String, Object>>();
-        listItemAdapter = new SimpleAdapter(this,
-                listitem,
-                R.layout.qcode_list,
-                new String[]{"list_rfid", "list_button",
-                        "list_qrcode1", "list_qrcode2", "list_qrcode3",
-                        "list_qrcode4", "list_qrcode5"},
-                new int[]{R.id.qcode_list_tv, R.id.qcode_list_bt,
-                        R.id.qcode_tv_1, R.id.qcode_tv_2, R.id.qcode_tv_3,
-                        R.id.qcode_tv_4, R.id.qcode_tv_5}) {
-            //添加监听器
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public View getView(final int position, View convertView, ViewGroup parent) {
-                final int p = position;
-                final View view = super.getView(position, convertView, parent);
-                Button useBtn = (Button) view.findViewById(R.id.qcode_list_bt);
-                final TextView rfid = (TextView) view.findViewById(R.id.qcode_list_tv);
-                useBtn.setOnClickListener(new View.OnClickListener() {
-                    *//*传递rfidNum的值*//*
-                    @Override
-                    public void onClick(View v) {
-                        d("onclick", "" + p + "===" + rfid.getText());
-                        Intent intent = new Intent(QcodeActivity.this, ScanActivity.class);
-                        intent.putExtra("rfidNum", rfid.getText());
-                        startActivity(intent);
-                    }
-                });
-                return super.getView(position, convertView, parent);
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                new AlertDialog.Builder(context)
+                        .setTitle("提示")
+                        .setMessage("确定删除这条信息吗?")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mRFIDCodes.remove(position);
+                                mBoxNameList.remove(position);
+                                peiXiangInfos.remove(position);
+                                myBaseAdapter.notifyDataSetChanged();
+                            }
+                        })
+                        .setNegativeButton("取消", null)
+                        .show();
+                return false;
             }
-        };
-        d("test", "" + listitem);*/
-        //LV_RFID.setAdapter(listItemAdapter);
-        //init();
+        });
+
+        onClickListener();
     }
 
     /**
@@ -210,22 +195,6 @@ public class QcodeActivity extends Activity {
      */
     @Override
     protected void onResume() {
-        /*for (int i = 0; i < listitem.size(); i++) {
-            Map map = listitem.get(i);
-            if (rfidNum != null && map.get("list_rfid").equals(rfidNum)) {
-                List list = reFreshDataMap.get(rfidNum);
-                for (int j = 0; j < list.size(); j++) {
-                    String num = "" + (j + 1);
-                    String QR_Code = (String) list.get(j);
-                    map.put("list_button", "点击修改二维码");
-                    map.put("list_qrcode" + num, QR_Code);
-                }
-                d("map", "" + map);
-                listitem.add(map);
-            }
-            listitem.remove(i);
-        }
-        listItemAdapter.notifyDataSetChanged();*/
         super.onResume();
     }
 
@@ -289,9 +258,7 @@ public class QcodeActivity extends Activity {
      * 生成文件导出
      */
     private void commitData() {
-        ResultInfo ri = new ResultInfo();
-        Map dataMap = new HashMap();
-        dataMap.put("GUARD_CODE", loginUser.getLoginName());
+
         StringBuffer sb = new StringBuffer();
         sb.append("{").append("GUARD_CODE:").append(loginUser.getLoginName()).append(",BOXRFIDQR: [");
         DBManager dbManager = new DBManager(this);
@@ -329,8 +296,6 @@ public class QcodeActivity extends Activity {
         }
 */
         String tmp = sb.toString().substring(0, sb.toString().length() - 1) + "]}";
-        ri.setCode(ri.CODE_SUCCESS);
-        ri.setText(tmp);
         Log.i("====tmp==", "" + tmp);
 
         //将数据写入SD卡
@@ -350,38 +315,7 @@ public class QcodeActivity extends Activity {
      * 将扫描上来的款箱及其二维码保存到数据库中
      */
     private void saveInDatabase() {
-        /*Set keyset = reFreshDataMap.keySet();
-        ArrayList datalist = new ArrayList();
-        Iterator iterator = keyset.iterator();
-        while (iterator.hasNext()) {
-            PeiXiangInfo px = new PeiXiangInfo();
-            Object key = iterator.next();
-            String s = (String) key;
-            Object value = reFreshDataMap.get(key);
-            datalist = (ArrayList) value;
 
-            String QR_codeAll = null;
-            if (datalist != null && datalist.size() > 0) {
-                for (int i = 0; i < datalist.size(); i++) {
-                    String QR_code = (String) datalist.get(i);
-                    if (QR_codeAll == null) {
-                        QR_codeAll = QR_code;
-                    } else {
-                        QR_codeAll = QR_codeAll + ";" + QR_code;
-                    }
-                }
-                px.setBoxNum(s);
-                px.setQR_codelist(datalist);
-                px.setQR_code(QR_codeAll);
-                px.setScanningDate(FileUtil.getDate());
-                peiXiangInfos.add(px);
-                d("debug", px.getBoxNum());
-            } else {
-                px.setBoxNum(s);
-                px.setScanningDate(FileUtil.getDate());
-                peiXiangInfos.add(px);
-            }
-        }*/
         showWaitDialog("正在保存中.....");
         DBManager db = new DBManager(this);
         db.cleanPeiXiang();
@@ -486,23 +420,25 @@ public class QcodeActivity extends Activity {
             String rfid = (String) entry.getKey();
 
             DBManager db = new DBManager(context);
-            String boxName = db.queryCashBoxName(rfid);
+            Map<String,String> map = DataCach.getPdaLoginMsg().getAllPdaBoxsMap();
+            String boxName = map.get(rfid);
+//            String boxName = db.queryCashBoxName(rfid);
             if (boxName != null && !boxName.equals("")) {
-                if (!mBoxNameList.contains(boxName)) {
-                    mBoxNameList.add(0, boxName);
+                String[] strings = boxName.split("&");
+                String boxName1 = strings[0];
+                if (!mBoxNameList.contains(boxName1)) {
+                    mBoxNameList.add(0, boxName1);
                     mRFIDCodes.add(0, rfid);
-                    PeiXiangInfo peiXiangInfo = new PeiXiangInfo(rfid, boxName);
+                    PeiXiangInfo peiXiangInfo = new PeiXiangInfo(rfid, boxName1);
                     peiXiangInfos.add(0, peiXiangInfo);
                 }
             }
 
-            /*if (!mRFIDCodes.contains(rfid)) {
-                mRFIDCodes.add(0, rfid);
-                PeiXiangInfo peiXiangInfo = new PeiXiangInfo(rfid);
-                peiXiangInfos.add(0, peiXiangInfo);
-            }*/
+
         }
-        mArrayAdapter.notifyDataSetChanged();
+
+        myBaseAdapter.notifyDataSetChanged();
+
     }
 
 
@@ -561,7 +497,7 @@ public class QcodeActivity extends Activity {
                         Log.i("peixiangInfos ---->", peiXiangInfo1.toString());
                     }
 
-                    mArrayAdapter.notifyDataSetChanged();
+                    myBaseAdapter.notifyDataSetChanged();
                     break;
                 default:
                     break;
