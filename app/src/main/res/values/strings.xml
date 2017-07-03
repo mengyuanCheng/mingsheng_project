@@ -48,5 +48,8 @@
     <string name="rfid">RFID:</string>
     <string name="scan_qc">二维码扫描</string>
     <string name="textview">TextView</string>
+    <string name="save_data">保存数据</string>
+    <string name="scan_QR_code">扫描二维码</string>
+    <string name="QR_code_scan">二维码扫描</string>
 
 </resources>

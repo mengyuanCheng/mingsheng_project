@@ -24,8 +24,10 @@ android {
 
 dependencies {
     compile files('libs/platform_sdk_v2.2.3.jar')
-    compile 'com.android.support:support-v4:19.1.0'
     compile files('libs/BaiduLBS_Android.jar')
     compile files('libs/UhfLib.jar')
+    compile 'com.android.support:support-v4:19.1.0'
     compile 'io.github.openfeign:feign-gson:9.4.0'
+    compile 'com.android.support:appcompat-v7:19.1.0'
+
 }

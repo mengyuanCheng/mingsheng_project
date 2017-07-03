@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/white"
+              android:orientation="vertical"
+              tools:context="com.grgbanking.ct.activity.SaveQRCodeActivity">
+
+<TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:padding="5dp"
+    android:text="@string/QR_code_scan"
+    android:textColor="#212020"/>
+
+<ListView
+    android:id="@+id/save_qrcode_listview"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:divider="@color/light_grey"
+    android:dividerHeight="1dp">
+
+</ListView>
+
+<Button
+    android:id="@+id/save_btn_scan_qrcode"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#FB7F2C"
+    android:text="@string/scan_QR_code"/>
+
+<Button
+    android:id="@+id/save_btn_save_data"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:background="#FB7F2C"
+    android:text="@string/save_data"/>
+
+</LinearLayout>

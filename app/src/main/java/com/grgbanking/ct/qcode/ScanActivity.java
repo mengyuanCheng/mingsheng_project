@@ -30,7 +30,7 @@ import java.util.ArrayList;
  * @author ：     cmy
  * @version :     2016/11/11.
  * @e-mil ：      mengyuan.cheng.mier@gmail.com
- * @Description :
+ * @Description : 二维码扫描界面,扫描结果返回给ScanQRCodeActivity
  */
 
 public class ScanActivity extends Activity {

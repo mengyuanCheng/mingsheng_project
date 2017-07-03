@@ -151,6 +151,9 @@ public class QcodeActivity extends Activity {
 
             }
         });
+        /*
+        长按删除所选项操作
+         */
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {

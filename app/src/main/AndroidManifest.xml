@@ -85,9 +85,6 @@
         <activity
             android:name=".qcode.StatActivity"
             android:label="华联创通"/>
-        <activity
-            android:name=".activity.QRCodeActivity"
-            android:label="华联创通"/>
 
         <service android:name=".service.GrgbankService"/>
 
@@ -109,6 +106,8 @@
             android:value="nhbFfNwcxy5gzz7Tn8GbvaeK"/>
 
         <activity android:name=".activity.ScanQRCodeActivity">
+        </activity>
+        <activity android:name=".activity.SaveQRCodeActivity">
         </activity>
     </application>
 

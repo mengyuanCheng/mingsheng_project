@@ -8,68 +8,71 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.grgbanking.ct.R;
-import com.grgbanking.ct.qcode.QcodeActivity;
 import com.grgbanking.ct.qcode.ScanActivity;
+import com.grgbanking.ct.utils.FileUtil;
 
 import java.util.ArrayList;
 
 import static com.grgbanking.ct.qcode.ScanActivity.REQUEST_CODE_SCAN;
 
-/**
- * @author lazylee
- * @Description 用于显示rfid对应的款箱二维码结果列表
- *              通过跳转到扫描界面获取二维码数据数据
- *              保存信息将信息返回给 QcodeActivity
- *
- */
-public class ScanQRCodeActivity extends Activity implements View.OnClickListener{
-
+public class SaveQRCodeActivity extends Activity implements View.OnClickListener{
     private Context mContext;
     private ListView mListView;     // list列表
     private Button mBtnScanQRCode;  // 扫描按钮
     private Button mBtnSaveData;    // 保存数据
-    private int mFlag;
     ArrayList<String> mArrayList = new ArrayList<>();
     ArrayAdapter mArrayAdapter;
+
+    /**
+     * 定义文件名
+     */
+    private static final String FILE_NAME = "QRCODE";
+    /**
+     * 定义文件格式
+     */
+    private static final String FILE_FORMAT = ".txt";
+    /**
+     * 1
+     * 定义文件路径
+     */
+    private static final String FILE_PATH = "/sdcard/Download/";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan_qrcode);
-        Intent intent = getIntent();
-        mFlag = intent.getFlags();
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_save_qrcode);
 
-        if(intent.getBundleExtra("bundle") != null){
-            Bundle bundle = intent.getBundleExtra("bundle");
-            mArrayList = (ArrayList<String>) bundle.getSerializable("list");
-            if(mArrayList != null){
-                Log.i("ScanQRCodeActivity->",mArrayList.toString());
-            }
-        }
-
-        mContext = ScanQRCodeActivity.this;
-        mListView = (ListView) findViewById(R.id.scan_qrcode_listview);
-        mBtnScanQRCode = (Button) findViewById(R.id.scan_btn_qrcode);
-        mBtnScanQRCode.setOnClickListener(this);
-        mBtnSaveData = (Button) findViewById(R.id.scan_btn_save_data);
-        mBtnSaveData.setOnClickListener(this);
+        mContext = SaveQRCodeActivity.this;
+        mListView = (ListView) findViewById(R.id.save_qrcode_listview);
+        mBtnSaveData = (Button) findViewById(R.id.save_btn_save_data);
+        mBtnScanQRCode = (Button) findViewById(R.id.save_btn_scan_qrcode);
 
         mArrayAdapter = new ArrayAdapter(mContext,R.layout.array_listview_item_view,
                 R.id.array_listview_textview,mArrayList);
         mListView.setAdapter(mArrayAdapter);
 
+        mBtnScanQRCode.setOnClickListener(this);
+        mBtnSaveData.setOnClickListener(this);
+        /*
+        长按删除所选项
+         */
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view,final int position, long id) {
 
                 new AlertDialog.Builder(mContext)
                         .setTitle("提示")
-                        .setMessage("删除该钱捆?")
+                        .setMessage("删除所选项数据")
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -87,39 +90,38 @@ public class ScanQRCodeActivity extends Activity implements View.OnClickListener
                 return false;
             }
         });
-
-
-
     }
 
+    /**
+     * 根据<code>v</code>的id 来判断要执行的代码
+     * @param v 点击事件的所有者
+     */
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            /*扫描二维码*/
-            case R.id.scan_btn_qrcode:
+            case R.id.save_btn_scan_qrcode:
                 Intent intent = new Intent(mContext, ScanActivity.class);
                 startActivityForResult(intent, REQUEST_CODE_SCAN);
                 break;
-            /*保存数据*/
-            case R.id.scan_btn_save_data:
-                Intent commitIntent = new Intent();
-                commitIntent.addFlags(mFlag);
-                Bundle bundle = new Bundle();
-                bundle.putStringArrayList("list", mArrayList);
-                commitIntent.putExtra("bundle", bundle);
-                this.setResult(QcodeActivity.RESULT_CODE,commitIntent);
-                finish();
+            //TODO 保存信息,生成文件
+            case R.id.save_btn_save_data:
+                String date = FileUtil.getDate();
+                Log.d("date==", date);
+                FileUtil.writeString(FILE_PATH + FILE_NAME + date + FILE_FORMAT,
+                        "" + mArrayList.toString(), "GBk");
+                FileUtil.makeFileAvailable(mContext, FILE_PATH + FILE_NAME + date + FILE_FORMAT);
+                Toast.makeText(mContext, "数据上传成功！", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
         }
     }
+
     /**
-     * 处理扫描返回的结果
-     *
-     * @param requestCode
-     * @param resultCode
-     * @param data
+     * 接受扫描的返回结果
+     * @param requestCode 请求码
+     * @param resultCode  返回码
+     * @param data        储存数据的Intent
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

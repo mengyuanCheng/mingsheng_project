@@ -67,7 +67,7 @@ public class PeixiangActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClass(PeixiangActivity.this,QRCodeActivity.class);
+                intent.setClass(PeixiangActivity.this,SaveQRCodeActivity.class);
                 startActivity(intent);
             }
         });
