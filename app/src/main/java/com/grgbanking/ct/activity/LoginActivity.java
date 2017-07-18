@@ -147,13 +147,13 @@ public class LoginActivity extends Activity {
 
         loginUtil = new LoginUtil(this);
 
-        if (loginUtil.getBooleanInfo(Constants.ISSAVEPASS)){
+        if (loginUtil.getBooleanInfo(Constants.ISSAVEPASS)) {
             remPasswordView.setChecked(true);
             loginNameView.setText(loginUtil.getStringInfo(Constants.USER_NAME));
             passwordView.setText(loginUtil.getStringInfo(Constants.PASSWORD));
         }
 
-//        remPasswordView.setChecked(true);//默认记住密码
+        //        remPasswordView.setChecked(true);//默认记住密码
 
 
         //登录操作
@@ -535,6 +535,7 @@ public class LoginActivity extends Activity {
                             extract.setBankName(info.getBankName());
                             extract.setLineId(pdaLoginMsg.getLineId());
                             extract.setCashBoxInfoList(info.getCashBoxInfoList());
+                            extract.setNetPersonInfoList(info.getNetPersonInfoList());
                             DBManager extractdb = new DBManager(context);
                             extractdb.addExtract(extract);
                         } else if (info.getFlag().equals("0")) {
@@ -594,6 +595,7 @@ public class LoginActivity extends Activity {
 
         /**
          * 执行完成后
+         *
          * @param s
          */
         @Override
@@ -616,12 +618,12 @@ public class LoginActivity extends Activity {
             params.add(new BasicNameValuePair("login_name", loginNameViewValue));
             params.add(new BasicNameValuePair("login_password", passwordViewValue));
 
-            if (remPasswordView.isChecked()){
-                loginUtil.setUserInfo(Constants.USER_NAME,loginNameViewValue);
-                loginUtil.setUserInfo(Constants.PASSWORD,passwordViewValue);
-                loginUtil.setUserInfo(Constants.ISSAVEPASS,true);
-            }else if (!remPasswordView.isChecked()){
-                loginUtil.setUserInfo(Constants.ISSAVEPASS,false);
+            if (remPasswordView.isChecked()) {
+                loginUtil.setUserInfo(Constants.USER_NAME, loginNameViewValue);
+                loginUtil.setUserInfo(Constants.PASSWORD, passwordViewValue);
+                loginUtil.setUserInfo(Constants.ISSAVEPASS, true);
+            } else if (!remPasswordView.isChecked()) {
+                loginUtil.setUserInfo(Constants.ISSAVEPASS, false);
             }
 
             /**判断网络连接状态 */

@@ -313,6 +313,22 @@ public class DBManager {
             values.put("netTaskStatus", extract.getNetTaskStatus());
             values.put("lineSn", extract.getLineSn());
             values.put("lineId", extract.getLineId());
+
+            //插入网点人员
+            ContentValues values1 = new ContentValues();
+            List<PdaNetPersonInfo> personList = extract.getNetPersonInfoList();
+            if (personList != null && personList.size() > 0) {
+                for (PdaNetPersonInfo personInfo : personList) {
+                    db = helper.getWritableDatabase();
+                    values1.put("bankId", extract.getBankId());
+                    values1.put("netPersonId", personInfo.getNetPersonId());
+                    values1.put("netPersonName", personInfo.getNetPersonName());
+                    values1.put("netPersonRFID", personInfo.getNetPersonRFID());
+                    db.insert(DBHelper.TABLE_NetMan_NAME, null, values1);
+                    db.close();
+                }
+            }
+
             List<PdaCashboxInfo> el = extract.getCashBoxInfoList();
             for (int i = 0; i < el.size(); i++) {
                 PdaCashboxInfo p = new PdaCashboxInfo();
@@ -608,14 +624,14 @@ public class DBManager {
     /**
      * 根据RFID查询款箱名称
      *
-     * @param rfidNum   rfid号
+     * @param rfidNum rfid号
      * @return boxName
      */
     public String queryCashBoxName(String rfidNum) {
-        String boxName ="";
+        String boxName = "";
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM PdaCashboxInfo where rfidNum = ?", new String[]{rfidNum});
-        if(c.moveToFirst()){
+        if (c.moveToFirst()) {
             boxName = c.getString(c.getColumnIndex("BoxSn"));
         }
         c.close();
