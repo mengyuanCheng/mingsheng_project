@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.grgbanking.ct.entity.ConvoyManInfo;
 import com.grgbanking.ct.entity.PeiXiangInfo;
+import com.grgbanking.ct.entity.TaskInfo;
 import com.grgbanking.ct.scan.Recordnet;
 import com.grgbanking.ct.scan.Waternet;
 import com.hlct.framework.business.message.entity.PdaCashboxInfo;
@@ -30,6 +31,44 @@ public class DBManager {
 
     public DBManager(Context context) {
         helper = new DBHelper(context);
+    }
+
+    public void addTaskInfo(TaskInfo t) {
+        try {
+            ContentValues values = new ContentValues();
+            db = helper.getWritableDatabase();
+            values.put("bankID", t.getBankID());
+            values.put("time", t.getTime());
+            values.put("status", t.getStatus());
+            values.put("netType", t.getNetType());
+            db.insert(DBHelper.TABLE_TASKINFO_NAME, null, values);
+            db.close();
+        } finally {
+
+        }
+    }
+
+    /**
+     * @param bankID 网点ID
+     * @return
+     */
+    public List<TaskInfo> queryTaskInfo(String bankID) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        List<TaskInfo> list = new ArrayList<>();
+        Cursor c = db.rawQuery("SELECT * FROM TaskInfo where bankID = ?", new String[]{bankID});
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    TaskInfo t = new TaskInfo();
+                    t.setBankID(c.getString(0));
+                    t.setTime(c.getString(1));
+                    t.setStatus(c.getString(2));
+                    t.setNetType(c.getString(3));
+                    list.add(t);
+                } while (c.moveToNext());
+            }
+        }
+        return list;
     }
 
 

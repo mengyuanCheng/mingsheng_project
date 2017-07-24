@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
-
+//使用greendao
+apply plugin: 'org.greenrobot.greendao'
 android {
     compileSdkVersion 19
     buildToolsVersion "25.0.3"
@@ -21,6 +22,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 }
+    //greendao配置
+    greendao {
+        //版本号，升级时可配置
+        schemaVersion 1
+        daoPackage 'com.grgbanking.ct.database'
+        targetGenDir 'src/main/java'
+    }
 
 dependencies {
     compile files('libs/platform_sdk_v2.2.3.jar')
@@ -29,5 +37,6 @@ dependencies {
     compile 'com.android.support:support-v4:19.1.0'
     compile 'io.github.openfeign:feign-gson:9.4.0'
     compile 'com.android.support:appcompat-v7:19.1.0'
-
+    //greendao依赖
+    compile 'org.greenrobot:greendao:3.2.0'
 }

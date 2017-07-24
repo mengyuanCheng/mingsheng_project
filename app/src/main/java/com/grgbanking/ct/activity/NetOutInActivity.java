@@ -113,111 +113,112 @@ public class NetOutInActivity extends Activity {
         //初始化缓存，将缓存清空
         DataCach.clearAllDataCach();
 
-        netInButton.setOnClickListener(new OnClickListener() {
-                                           @Override
-                                           public void onClick(View v) {
-                                               showWaitDialog("正在加载网点入库信息...");
-                                               LoginUser loginUser = DataCach.loginUser;
-                                               //判断是出库还是入库
-                                               DataCach.netType = Constants.NET_COMMIT_TYPE_IN;
+        netInButton
+                .setOnClickListener(new OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            showWaitDialog("正在加载网点入库信息...");
+                                            LoginUser loginUser = DataCach.loginUser;
+                                            //判断是出库还是入库
+                                            DataCach.netType = Constants.NET_COMMIT_TYPE_IN;
 
-                                               List<NameValuePair> params = new ArrayList<>();
-                                               params.add(new BasicNameValuePair("login_name", loginUser.getLoginName()));
-                                               params.add(new BasicNameValuePair("scanning_type", Constants.LOGIN_NET_IN));
-                                               //访问数据库
-                                               DBManager db = new DBManager(context);
-                                               PdaLoginMsg pdaLoginMsg = new PdaLoginMsg();
-                                               //取出 押运人员
-                                               ArrayList<ConvoyMan> manList = (ArrayList<ConvoyMan>) db.queryConvoyMan();
-                                               List<PdaGuardManInfo> pdaGuarManInfoList = new ArrayList<>();
-                                               //存入pdaLoginMessage
-                                               if (manList != null && manList.size() > 0) {
-                                                   for (ConvoyMan cMan : manList) {
-                                                       PdaGuardManInfo manInfo = new PdaGuardManInfo();
-                                                       manInfo.setGuardManId(cMan.getGuardManId());
-                                                       manInfo.setGuardManName(cMan.getGuardManName());
-                                                       manInfo.setGuardManRFID(cMan.getGuardManRFID());
-                                                       pdaGuarManInfoList.add(manInfo);
-                                                   }
-                                                   pdaLoginMsg.setPdaGuardManInfo(pdaGuarManInfoList);
-                                               }
-                                               //取出网点人员
-                                               List<NetMan> netMen = db.queryNetMan();
-                                               List<PdaNetPersonInfo> pdaNetPersonInfoList = new ArrayList<>();
-                                               if (netMen != null && netMen.size() > 0) {
-                                                   for (NetMan info : netMen) {
-                                                       PdaNetPersonInfo pdaNetPersonInfo = new PdaNetPersonInfo();
-                                                       pdaNetPersonInfo.setNetPersonId(info.getNetPersonId());
-                                                       pdaNetPersonInfo.setNetPersonName(info.getNetPersonName());
-                                                       pdaNetPersonInfo.setNetPersonRFID(info.getNetPersonRFID());
-                                                       pdaNetPersonInfoList.add(pdaNetPersonInfo);
-                                                   }
-                                               }
-                                               //取出所有款箱
-                                               Map<String, String> pdaCashboxInfoMap = new HashMap<>();
-                                               List<CashBox> cashBoxes = db.queryCashBox();
-                                               List<PdaCashboxInfo> pdaCashboxInfoList = new ArrayList<>();
-                                               if (cashBoxes != null && cashBoxes.size() > 0) {
-                                                   for (CashBox info : cashBoxes) {
-                                                       PdaCashboxInfo pdaCashboxInfo = new PdaCashboxInfo();
-                                                       pdaCashboxInfo.setBankId(info.getBankId());
-                                                       pdaCashboxInfo.setBoxSn(info.getBoxSn());
-                                                       pdaCashboxInfo.setRfidNum(info.getRfidNum());
-                                                       pdaCashboxInfoList.add(pdaCashboxInfo);
-                                                       pdaCashboxInfoMap.put(info.getRfidNum(), info.getBoxSn());
-                                                   }
-                                               }
+                                            List<NameValuePair> params = new ArrayList<>();
+                                            params.add(new BasicNameValuePair("login_name", loginUser.getLoginName()));
+                                            params.add(new BasicNameValuePair("scanning_type", Constants.LOGIN_NET_IN));
+                                            //访问数据库
+                                            DBManager db = new DBManager(context);
+                                            PdaLoginMsg pdaLoginMsg = new PdaLoginMsg();
+                                            //取出 押运人员
+                                            ArrayList<ConvoyMan> manList = (ArrayList<ConvoyMan>) db.queryConvoyMan();
+                                            List<PdaGuardManInfo> pdaGuarManInfoList = new ArrayList<>();
+                                            //存入pdaLoginMessage
+                                            if (manList != null && manList.size() > 0) {
+                                                for (ConvoyMan cMan : manList) {
+                                                    PdaGuardManInfo manInfo = new PdaGuardManInfo();
+                                                    manInfo.setGuardManId(cMan.getGuardManId());
+                                                    manInfo.setGuardManName(cMan.getGuardManName());
+                                                    manInfo.setGuardManRFID(cMan.getGuardManRFID());
+                                                    pdaGuarManInfoList.add(manInfo);
+                                                }
+                                                pdaLoginMsg.setPdaGuardManInfo(pdaGuarManInfoList);
+                                            }
+                                            //取出网点人员
+                                            List<NetMan> netMen = db.queryNetMan();
+                                            List<PdaNetPersonInfo> pdaNetPersonInfoList = new ArrayList<>();
+                                            if (netMen != null && netMen.size() > 0) {
+                                                for (NetMan info : netMen) {
+                                                    PdaNetPersonInfo pdaNetPersonInfo = new PdaNetPersonInfo();
+                                                    pdaNetPersonInfo.setNetPersonId(info.getNetPersonId());
+                                                    pdaNetPersonInfo.setNetPersonName(info.getNetPersonName());
+                                                    pdaNetPersonInfo.setNetPersonRFID(info.getNetPersonRFID());
+                                                    pdaNetPersonInfoList.add(pdaNetPersonInfo);
+                                                }
+                                            }
+                                            //取出所有款箱
+                                            Map<String, String> pdaCashboxInfoMap = new HashMap<>();
+                                            List<CashBox> cashBoxes = db.queryCashBox();
+                                            List<PdaCashboxInfo> pdaCashboxInfoList = new ArrayList<>();
+                                            if (cashBoxes != null && cashBoxes.size() > 0) {
+                                                for (CashBox info : cashBoxes) {
+                                                    PdaCashboxInfo pdaCashboxInfo = new PdaCashboxInfo();
+                                                    pdaCashboxInfo.setBankId(info.getBankId());
+                                                    pdaCashboxInfo.setBoxSn(info.getBoxSn());
+                                                    pdaCashboxInfo.setRfidNum(info.getRfidNum());
+                                                    pdaCashboxInfoList.add(pdaCashboxInfo);
+                                                    pdaCashboxInfoMap.put(info.getRfidNum(), info.getBoxSn());
+                                                }
+                                            }
 
-                                               //取出网点信息
-                                               List<NetInfo> netInfo = db.queryNetInfo();
-                                               List<PdaNetInfo> pdaNetInfoList = new ArrayList<>();
-                                               //存入pdaLoginMessage
-                                               if (netInfo != null && netInfo.size() > 0) {
-                                                   for (NetInfo info : netInfo) {
-                                                       PdaNetInfo pdaNetInfo = new PdaNetInfo();
-                                                       pdaNetInfo.setBankId(info.getBankId());
-                                                       pdaNetInfo.setNetTaskStatus(info.getNetTaskStatus());
-                                                       pdaNetInfo.setBankName(info.getBankName());
-                                                       pdaNetInfo.setLineId(info.getLineId());
-                                                       pdaNetInfo.setFlag(info.getFlag());
-                                                       pdaNetInfo.setCashBoxInfoList(pdaCashboxInfoList);
-                                                       pdaNetInfo.setNetPersonInfoList(pdaNetPersonInfoList);
-                                                       pdaNetInfoList.add(pdaNetInfo);
-                                                       pdaLoginMsg.setLineId(info.getLineId());
-                                                       pdaLoginMsg.setLineSn(info.getLineSn());
-                                                   }
-                                               }
-                                               pdaLoginMsg.setNetInfoList(pdaNetInfoList);
-                                               pdaLoginMsg.setAllPdaBoxsMap(pdaCashboxInfoMap);
-
-
-                                               //取出登录人员
-
-                                               List<LoginMan> loginMan = db.queryLoginMan();
-                                               List<PdaLoginManInfo> pdaLoginManInfoList = new ArrayList<>();
-                                               if (loginMan != null && loginMan.size() > 0) {
-                                                   for (LoginMan info : loginMan) {
-                                                       PdaLoginManInfo pdaLoginManInfo = new PdaLoginManInfo();
-                                                       pdaLoginManInfo.setLogin_name(info.getLogin_name());
-                                                       pdaLoginManInfo.setLoginId(info.getLoginId());
-                                                       pdaLoginManInfo.setPassword(info.getPassword());
-                                                       pdaLoginManInfo.setLine(info.getLine());
-                                                       pdaLoginManInfo.setFlag(info.getFlag());
-                                                       pdaLoginManInfoList.add(pdaLoginManInfo);
-                                                   }
-                                                   pdaLoginMsg.setPdaLoginManInfo(pdaLoginManInfoList);
-                                               }
+                                            //取出网点信息
+                                            List<NetInfo> netInfo = db.queryNetInfo();
+                                            List<PdaNetInfo> pdaNetInfoList = new ArrayList<>();
+                                            //存入pdaLoginMessage
+                                            if (netInfo != null && netInfo.size() > 0) {
+                                                for (NetInfo info : netInfo) {
+                                                    PdaNetInfo pdaNetInfo = new PdaNetInfo();
+                                                    pdaNetInfo.setBankId(info.getBankId());
+                                                    pdaNetInfo.setNetTaskStatus(info.getNetTaskStatus());
+                                                    pdaNetInfo.setBankName(info.getBankName());
+                                                    pdaNetInfo.setLineId(info.getLineId());
+                                                    pdaNetInfo.setFlag(info.getFlag());
+                                                    pdaNetInfo.setCashBoxInfoList(pdaCashboxInfoList);
+                                                    pdaNetInfo.setNetPersonInfoList(pdaNetPersonInfoList);
+                                                    pdaNetInfoList.add(pdaNetInfo);
+                                                    pdaLoginMsg.setLineId(info.getLineId());
+                                                    pdaLoginMsg.setLineSn(info.getLineSn());
+                                                }
+                                            }
+                                            pdaLoginMsg.setNetInfoList(pdaNetInfoList);
+                                            pdaLoginMsg.setAllPdaBoxsMap(pdaCashboxInfoMap);
 
 
-                                               // 传递 pdaLoginMsg
-                                               hideWaitDialog();
-                                               Intent intent = new Intent(NetOutInActivity.this, MainActivity.class);
-                                               intent.putExtra("pdaLoginMsg", pdaLoginMsg);
-                                               startActivity(intent);
-                                           }
-                                       }
+                                            //取出登录人员
 
-        );
+                                            List<LoginMan> loginMan = db.queryLoginMan();
+                                            List<PdaLoginManInfo> pdaLoginManInfoList = new ArrayList<>();
+                                            if (loginMan != null && loginMan.size() > 0) {
+                                                for (LoginMan info : loginMan) {
+                                                    PdaLoginManInfo pdaLoginManInfo = new PdaLoginManInfo();
+                                                    pdaLoginManInfo.setLogin_name(info.getLogin_name());
+                                                    pdaLoginManInfo.setLoginId(info.getLoginId());
+                                                    pdaLoginManInfo.setPassword(info.getPassword());
+                                                    pdaLoginManInfo.setLine(info.getLine());
+                                                    pdaLoginManInfo.setFlag(info.getFlag());
+                                                    pdaLoginManInfoList.add(pdaLoginManInfo);
+                                                }
+                                                pdaLoginMsg.setPdaLoginManInfo(pdaLoginManInfoList);
+                                            }
+
+
+                                            // 传递 pdaLoginMsg
+                                            hideWaitDialog();
+                                            Intent intent = new Intent(NetOutInActivity.this, MainActivity.class);
+                                            intent.putExtra("pdaLoginMsg", pdaLoginMsg);
+                                            startActivity(intent);
+                                        }
+                                    }
+
+                );
 
         netOutButton.setOnClickListener(new OnClickListener() {
                                             @Override
@@ -260,6 +261,7 @@ public class NetOutInActivity extends Activity {
                                                             pdaNetPersonInfo.setNetPersonRFID(info.getNetPersonRFID());
                                                             pdaNetPersonInfoList.add(pdaNetPersonInfo);
                                                         }
+
                                                     }
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
@@ -289,6 +291,7 @@ public class NetOutInActivity extends Activity {
                                                             pdaNetPersonInfo.setNetPersonName(net.getNetPersonName());
                                                             pdaNetPersonInfo.setNetPersonRFID(net.getNetPersonRFID());
                                                             netPersonInfoList.add(pdaNetPersonInfo);
+                                                            Log.d("===",net.getNetPersonName());
                                                         }
                                                         info.setNetPersonInfoList(netPersonInfoList);
                                                     }

@@ -28,6 +28,7 @@ import com.grgbanking.ct.cach.DataCach;
 import com.grgbanking.ct.database.DBManager;
 import com.grgbanking.ct.database.ExtractBoxs;
 import com.grgbanking.ct.entity.PdaLoginMsg;
+import com.grgbanking.ct.entity.TaskInfo;
 import com.grgbanking.ct.rfid.UfhData;
 import com.grgbanking.ct.rfid.UfhData.UhfGetData;
 import com.grgbanking.ct.scan.Recordnet;
@@ -62,6 +63,7 @@ import static com.grgbanking.ct.cach.DataCach.pdaLoginMsg;
 
 @SuppressLint("NewApi")
 public class DetailActivity extends Activity {
+    //Dao对象的管理者
     private static final int SCAN_INTERVAL = 10;
     private static final int MSG_UPDATE_LISTVIEW = 0;
     private static HashMap<String, Object> boxesMap1 = null;//保存正确款箱map
@@ -211,9 +213,11 @@ public class DetailActivity extends Activity {
         commitNoButton.setOnClickListener(click);
         startDeviceButton.setOnClickListener(click);
 
+
         // 点击添加照片按钮操作内容
         //		findViewById(R.id.add_photo).setOnClickListener(click);
     }
+
 
     private void flashInfo() {
         mHandler = new Handler() {
@@ -739,8 +743,17 @@ public class DetailActivity extends Activity {
                         /** 获取当前时间，将json写入文件*/
                         String date1 = FileUtil.getDate();
                         FileUtil.writeString(FILE_PATH + FILE_NAME_IN + date1 + FILE_FORMAT, par, "GBK");
+                        {
+                            TaskInfo tk = new TaskInfo();
+                            tk.setBankID(recordnet.getBankId());
+                            tk.setNetType("1");
+                            tk.setStatus("0");
+                            tk.setTime(date1);
+                            db.addTaskInfo(tk);
+                        }
                         commitNoButton.setEnabled(false);
                     } else {
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -761,6 +774,14 @@ public class DetailActivity extends Activity {
                         /** 获取当前时间，将json写入文件*/
                         String date1 = FileUtil.getDate();
                         FileUtil.writeString(FILE_PATH + FILE_NAME_OUT + date1 + FILE_FORMAT, par, "GBK");
+                        {
+                            TaskInfo tk = new TaskInfo();
+                            tk.setBankID(recordnet.getBankId());
+                            tk.setNetType("0");
+                            tk.setStatus("0");
+                            tk.setTime(date1);
+                            db.addTaskInfo(tk);
+                        }
                         commitNoButton.setEnabled(false);
                     } else {
                     }
@@ -781,8 +802,8 @@ public class DetailActivity extends Activity {
     private String fileIsWrite() {
         String msg = "";
         String date = FileUtil.getDate();
-
         switch (DataCach.netType) {
+
             case NET_COMMIT_TYPE_OUT:
                 if (FileUtil.isExist(FILE_PATH + FILE_NAME_OUT + date + FILE_FORMAT)) {
                     msg = "true";
@@ -800,7 +821,6 @@ public class DetailActivity extends Activity {
                 }
                 break;
         }
-
         return msg;
     }
 

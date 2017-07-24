@@ -8,7 +8,6 @@ import com.hlct.framework.business.message.entity.PdaLoginMessage;
  * @e-mil ：      mengyuan.cheng.mier@gmail.com
  * @Description :
  */
-
 public class ResultInfo implements java.io.Serializable{
 
 

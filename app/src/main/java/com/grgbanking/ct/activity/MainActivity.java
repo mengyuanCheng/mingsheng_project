@@ -2,8 +2,10 @@ package com.grgbanking.ct.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,17 +34,20 @@ import com.grgbanking.ct.database.NetInfo;
 import com.grgbanking.ct.database.Person;
 import com.grgbanking.ct.database.PersonTableHelper;
 import com.grgbanking.ct.entity.PdaLoginMsg;
-import com.grgbanking.ct.scan.Recordnet;
+import com.grgbanking.ct.entity.TaskInfo;
+import com.grgbanking.ct.utils.FileUtil;
 import com.hlct.framework.business.message.entity.PdaCashboxInfo;
 import com.hlct.framework.business.message.entity.PdaNetInfo;
 import com.hlct.framework.business.message.entity.PdaNetPersonInfo;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.grgbanking.ct.cach.DataCach.netType;
+import static com.grgbanking.ct.utils.FileUtil.ConversionDate;
 
 public class MainActivity extends Activity {
     private PopupMenu popupMenu;
@@ -65,7 +70,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
-
 
         popupMenu = new PopupMenu(this, findViewById(R.id.popupmenu_btn));
         menu = popupMenu.getMenu();
@@ -122,14 +126,6 @@ public class MainActivity extends Activity {
 
         showWaitDialog("正在加载中...");
 
-        try {
-            loadLoginMessageCach();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(context, "" + e, Toast.LENGTH_SHORT).show();
-        }
-
-
         hideWaitDialog();
 
 
@@ -158,10 +154,11 @@ public class MainActivity extends Activity {
                     intent.putExtra("bundle", bundle);
                     startActivity(intent);
                 } else {
-                    Toast.makeText(context, "该任务已完成", Toast.LENGTH_LONG).show();
+                    showInfoDialog("该任务已完成");
                 }
             }
         });
+
 
         // 点击返回按钮操作内容
         mainBackButton.setOnClickListener(new OnClickListener() {
@@ -190,11 +187,37 @@ public class MainActivity extends Activity {
         });
     }
 
+    private void showInfoDialog(String msg) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        //    设置Title的内容
+        builder.setTitle("提示");
+        //    设置Content来显示一个信息
+        builder.setMessage(msg);
+        //    设置一个NeutralButton
+        builder.setNeutralButton("确认", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        //    展示Dialog
+        builder.show();
+    }
+
     public void popupmenu(View v) {
         popupMenu.show();
     }
 
+    @Override
+    protected void onStart() {
+        loadLoginMessageCach();
+        super.onStart();
+    }
+
     private void loadLoginMessageCach() {
+        listItem.clear();
+
         synchronized (DataCach.taskMap) {
             if (netType.equals("1")) {//网点入库
                 if (pdaLoginMsg != null) {
@@ -383,19 +406,25 @@ public class MainActivity extends Activity {
      */
     private boolean getTaskStatus(String netType, String bankId) {
         boolean flag = false;
-        DBManager db = new DBManager(context);
-        ArrayList<Recordnet> recordnetList = (ArrayList<Recordnet>) db.queryRecordnet();
-        for (Recordnet recordnet : recordnetList) {
-            String id = recordnet.getBankId();
-            String type = recordnet.getLineType();
-            if (id.equals(bankId) && type.equals(netType)) {
-                flag = true;
-                return flag;
-            } else {
-                break;
+        List<TaskInfo> tkList = new ArrayList<>();
+        DBManager db = new DBManager(getApplicationContext());
+        try {
+            tkList = db.queryTaskInfo(bankId);
+            for (int i = 0; i < tkList.size(); i++) {
+                FileUtil f = new FileUtil();
+                boolean b = f.areSameDay(ConversionDate(tkList.get(i).getTime()),
+                        new Date(System.currentTimeMillis()));
+                if (b) {
+                    flag = tkList.get(i).getNetType().equals(netType);
+                } else {
+                    return flag;
+                }
             }
+            return flag;
+        } catch (Exception e) {
+            return flag;
         }
-        return flag;
+
     }
 
     /**
@@ -414,7 +443,8 @@ public class MainActivity extends Activity {
                 id = netinfo.getBankId();
             }
         }
-        Log.d("debug", id);
+        //        Log.d("debug", id);
         return id;
     }
+
 }
