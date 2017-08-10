@@ -61,13 +61,23 @@ public class DBHelper extends SQLiteOpenHelper {
      * 出库款箱表
      */
     public static final String TABLE_EXTRACTBOXS_NAME = "ExtractBoxs";
+    /**
+     * 任务记录表
+     */
+    public static final String TABLE_TASKINFO_NAME = "TaskInfo";
     //database name
-    private static final String DATABASE_NAME = "hlctPDA.db";
+    public static final String DATABASE_NAME = "hlctPDA.db";
     private static final SQLiteDatabase.CursorFactory DATABASE_FACTORY = null;
     private static final int DATABASE_VERSION = 1;
+    private String sql_create_TaskInfo = "CREATE TABLE IF NOT EXISTS " +
+            TABLE_TASKINFO_NAME +
+            "(bankID VARCHAR," +
+            "time VARCHAR," +
+            "status VARCHAR," +
+            "netType VARCHAR)";
     private String sql_create_PeiXiang = "CREATE TABLE IF NOT EXISTS " +
             TABLE_PeiXiangInfo_NAME +
-            "(BoxNum VARCHAR,"+
+            "(BoxNum VARCHAR," +
             "scanningDate VARCHAR," +
             "boxName VARCHAR," +
             "QR_codelist VARCHAR)";
@@ -173,7 +183,8 @@ public class DBHelper extends SQLiteOpenHelper {
             "bankName VARCHAR," +
             "netTaskStatus VARCHAR," +
             "lineSn VARCHAR," +
-            "lineId VARCHAR)";
+            "lineId VARCHAR," +
+            "personInfo VARCHAR)";
 
     private String sql_create_ExtractBoxs = "CREATE TABLE IF NOT EXISTS " +
             TABLE_EXTRACTBOXS_NAME +
@@ -192,6 +203,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.i("DBHelper", "onCreate被调用了");
         //创建表
+        db.execSQL(sql_create_TaskInfo);
         db.execSQL(sql_create_PeiXiang);
         db.execSQL(sql_create_ConvoyMan);
         db.execSQL(sql_create_NetMan);

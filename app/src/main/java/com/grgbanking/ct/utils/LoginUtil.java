@@ -23,6 +23,32 @@ public class LoginUtil {
         this.context = context;
     }
 
+    /**
+     * 存放网点的完成状态
+     * @param key 网点的ID
+     * @param value 完成的状态
+     */
+    public void setTaskStatus(String key,boolean value){
+        SharedPreferences sp = context.getSharedPreferences(USER_INFO,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.remove(key);
+        editor.putBoolean(key, value);
+        editor.commit();
+    }
+
+
+    /**
+     * 删除信息
+     * @param key
+     */
+    public void deletTaskStatus(String key){
+        SharedPreferences sp = context.getSharedPreferences(USER_INFO,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.remove(key);
+    }
+
     // 存放字符串型的值
 
     public void setUserInfo(String key, String value) {
@@ -70,4 +96,6 @@ public class LoginUtil {
                 Context.MODE_PRIVATE);
         return sp.getBoolean(key, false);
     }
+
+
 }

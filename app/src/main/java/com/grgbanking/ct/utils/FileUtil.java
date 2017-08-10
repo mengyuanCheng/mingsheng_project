@@ -14,8 +14,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.StreamCorruptedException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -185,6 +187,18 @@ public class FileUtil {
         return str;
     }
 
+    public static Date ConversionDate(String str) {
+        Date date = null;
+        DateFormat format = new SimpleDateFormat("yyyyMMdd");
+        try {
+            date = format.parse(str);
+            return date;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return date;
+        }
+    }
+
     /**
      * 遍历获取某目录下制定类型的所有文件
      *
@@ -232,6 +246,8 @@ public class FileUtil {
     }
 
     /**
+     * 使文件在电脑中可见
+     *
      * @param context  传入activity
      * @param filePath 传入file对象的文件路径
      */
@@ -245,5 +261,16 @@ public class FileUtil {
 
     }
 
+    public static boolean areSameDay(Date dateA, Date dateB) {
+        Calendar calDateA = Calendar.getInstance();
+        calDateA.setTime(dateA);
+
+        Calendar calDateB = Calendar.getInstance();
+        calDateB.setTime(dateB);
+
+        return calDateA.get(Calendar.YEAR) == calDateB.get(Calendar.YEAR)
+                && calDateA.get(Calendar.MONTH) == calDateB.get(Calendar.MONTH)
+                && calDateA.get(Calendar.DAY_OF_MONTH) == calDateB.get(Calendar.DAY_OF_MONTH);
+    }
 
 }
