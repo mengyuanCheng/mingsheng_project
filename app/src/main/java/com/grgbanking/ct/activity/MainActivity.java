@@ -414,7 +414,7 @@ public class MainActivity extends Activity {
                 id = netinfo.getBankId();
             }
         }
-        Log.d("debug", id);
+
         return id;
     }
 }

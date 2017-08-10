@@ -283,9 +283,12 @@ public class DetailActivity extends Activity {
                                     HashMap<String, Object> map = DataCach.taskMap.get(count + "");
                                     PdaNetInfo pni = (PdaNetInfo) map.get("data");
                                     List<PdaNetPersonInfo> netPersonInfoList = pni.getNetPersonInfoList();
+                                    Log.d("===netPersonInfoList",netPersonInfo+"");
                                     if (person2.trim().equals("")) {
                                         if (pni != null) {
                                             if (netPersonInfoList != null && netPersonInfoList.size() > 0) {
+                                                Log.d("===netPersonInfoList",netPersonInfo+"");
+                                                Log.d("===网点人员",key);
                                                 for (PdaNetPersonInfo info : netPersonInfoList) {
                                                     if (info.getNetPersonRFID().equals(key)) {
                                                         person2TextView.setText(info.getNetPersonName());
