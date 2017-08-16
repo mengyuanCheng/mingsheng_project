@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.grgbanking.ct.R;
 import com.grgbanking.ct.qcode.ScanActivity;
@@ -105,12 +104,25 @@ public class SaveQRCodeActivity extends Activity implements View.OnClickListener
                 break;
             //TODO 保存信息,生成文件
             case R.id.save_btn_save_data:
-                String date = FileUtil.getDate();
-                Log.d("date==", date);
-                FileUtil.writeString(FILE_PATH + FILE_NAME + date + FILE_FORMAT,
-                        "" + mArrayList.toString(), "GBk");
-                FileUtil.makeFileAvailable(mContext, FILE_PATH + FILE_NAME + date + FILE_FORMAT);
-                Toast.makeText(mContext, "数据上传成功！", Toast.LENGTH_SHORT).show();
+                if(mArrayList.isEmpty()){
+                    new AlertDialog.Builder(mContext)
+                            .setTitle("提示信息")
+                            .setMessage("数据为空！")
+                            .setPositiveButton("确认", null)
+                            .show();
+                }else {
+                    String date = FileUtil.getDate();
+                    Log.d("date==", date);
+                    FileUtil.writeString(FILE_PATH + FILE_NAME + date + FILE_FORMAT,
+                            "" + mArrayList.toString(), "GBk");
+                    FileUtil.makeFileAvailable(mContext, FILE_PATH + FILE_NAME + date + FILE_FORMAT);
+                    new AlertDialog.Builder(mContext)
+                            .setTitle("提示信息")
+                            .setMessage("保存数据成功！")
+                            .setPositiveButton("确认", null)
+                            .show();
+                }
+
                 break;
             default:
                 break;

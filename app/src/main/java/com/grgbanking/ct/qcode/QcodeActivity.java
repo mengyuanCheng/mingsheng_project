@@ -242,17 +242,7 @@ public class QcodeActivity extends Activity {
         BT_upDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AlertDialog.Builder(context)
-                        .setTitle("提示信息")
-                        .setMessage("请先确认是否保存信息,若未保存,新的数据将不会上传!")
-                        .setPositiveButton("确认上传", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                commitData();
-                            }
-                        }).setNegativeButton("取消上传", null)
-                        .show();
-
+                commitData();
             }
         });
 
@@ -313,7 +303,11 @@ public class QcodeActivity extends Activity {
         FileUtil.writeBytes(addr, writebytes);
         FileUtil.writeString(addr, tmp, "utf-8");
         FileUtil.makeFileAvailable(context, addr);
-        Toast.makeText(QcodeActivity.this, "数据上传成功！", Toast.LENGTH_SHORT).show();
+        new AlertDialog.Builder(context)
+                .setTitle("提示信息")
+                .setMessage("生成文件成功")
+                .setPositiveButton("确认", null)
+                .show();
         hideWaitDialog();
     }
 
@@ -328,14 +322,14 @@ public class QcodeActivity extends Activity {
         if (!peiXiangInfos.isEmpty()) {
             if (db.addPeiXiang(peiXiangInfos)) {
                 hideWaitDialog();
-                Toast.makeText(context, "保存成功!", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "保存成功!", Toast.LENGTH_SHORT).show();
             } else {
                 hideWaitDialog();
-                Toast.makeText(context, "保存失败!", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "保存失败!", Toast.LENGTH_SHORT).show();
             }
         } else {
             hideWaitDialog();
-            Toast.makeText(context, "数据为空!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "数据为空!", Toast.LENGTH_SHORT).show();
         }
 
 
