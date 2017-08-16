@@ -167,6 +167,7 @@ public class QcodeActivity extends Activity {
                                 mBoxNameList.remove(position);
                                 peiXiangInfos.remove(position);
                                 myBaseAdapter.notifyDataSetChanged();
+                                onResume();
                             }
                         })
                         .setNegativeButton("取消", null)
@@ -199,11 +200,12 @@ public class QcodeActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        saveInDatabase();
     }
 
 
     private void findViewById() {
-        BT_save = (Button) findViewById(R.id.save_btn);
+//        BT_save = (Button) findViewById(R.id.save_btn);
         BT_scan = (Button) findViewById(R.id.qcode_bt_scan);
         BT_stop = (Button) findViewById(R.id.qcode_bt_stop);
         //LV_RFID = (ListView) findViewById(R.id.list_qcdoe);
@@ -213,15 +215,16 @@ public class QcodeActivity extends Activity {
     }
 
     private void onClickListener() {
-        BT_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                saveInDatabase();
-            }
-        });
+//        BT_save.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                saveInDatabase();
+//            }
+//        });
         BT_scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 connDevices();
                 startDevices();
                 updataItem();

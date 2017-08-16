@@ -44,7 +44,7 @@
 
     </RelativeLayout>
 
-    <Button
+    <!--<Button
         android:id="@+id/stat_button"
         android:layout_width="200dp"
         android:layout_height="60dp"
@@ -53,7 +53,7 @@
         android:layout_below="@+id/peixiang_button"
         android:layout_marginTop="19dp"
         android:background="#FB7F2C"
-        android:text="统计"/>
+        android:text="统计"/>-->
 
     <Button
         android:id="@+id/peixiang_button"
@@ -62,7 +62,7 @@
         android:layout_height="60dp"
         android:layout_below="@+id/title_layout"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="19dp"
+        android:layout_marginTop="30dp"
         android:background="#FB7F2C"
         android:text="配箱"/>
 
@@ -71,11 +71,11 @@
         style="@style/buttonText"
         android:layout_width="200dp"
         android:layout_height="60dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         android:background="#FB7F2C"
-        android:text="二维码"
-        android:layout_below="@+id/stat_button"
-        android:layout_alignLeft="@+id/stat_button"
-        android:layout_alignStart="@+id/stat_button"/>
+        android:text="未用钱捆统计"
+        android:layout_below="@+id/peixiang_button"
+        android:layout_alignLeft="@+id/peixiang_button"
+        android:layout_alignStart="@+id/peixiang_button"/>
 
 </RelativeLayout>

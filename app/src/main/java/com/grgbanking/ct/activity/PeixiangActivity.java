@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.grgbanking.ct.R;
 import com.grgbanking.ct.qcode.QcodeActivity;
-import com.grgbanking.ct.qcode.StatActivity;
 
 /**
  * Created by Administrator on 2016/7/13.
@@ -34,7 +33,7 @@ public class PeixiangActivity extends Activity {
 
         PxButton = (Button) findViewById(R.id.peixiang_button);
         Pxback = (Button) findViewById(R.id.net_sysout_view);
-        StatButton = (Button) findViewById(R.id.stat_button);
+//        StatButton = (Button) findViewById(R.id.stat_button);
         QRButton = (Button) findViewById(R.id.QRCode_button);
 
         PxButton.setOnClickListener(new View.OnClickListener() {
@@ -54,14 +53,14 @@ public class PeixiangActivity extends Activity {
             }
         });
 
-        StatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setClass(PeixiangActivity.this, StatActivity.class);
-                startActivity(intent);
-            }
-        });
+//        StatButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent();
+//                intent.setClass(PeixiangActivity.this, StatActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
         QRButton.setOnClickListener(new View.OnClickListener() {
             @Override

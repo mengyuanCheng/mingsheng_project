@@ -2,8 +2,10 @@ package com.grgbanking.ct.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,17 +34,20 @@ import com.grgbanking.ct.database.NetInfo;
 import com.grgbanking.ct.database.Person;
 import com.grgbanking.ct.database.PersonTableHelper;
 import com.grgbanking.ct.entity.PdaLoginMsg;
-import com.grgbanking.ct.scan.Recordnet;
+import com.grgbanking.ct.entity.TaskInfo;
+import com.grgbanking.ct.utils.FileUtil;
 import com.hlct.framework.business.message.entity.PdaCashboxInfo;
 import com.hlct.framework.business.message.entity.PdaNetInfo;
 import com.hlct.framework.business.message.entity.PdaNetPersonInfo;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.grgbanking.ct.cach.DataCach.netType;
+import static com.grgbanking.ct.utils.FileUtil.ConversionDate;
 
 public class MainActivity extends Activity {
     private PopupMenu popupMenu;
