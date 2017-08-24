@@ -120,7 +120,7 @@ public class QcodeActivity extends Activity {
 
         init();
 
-        myBaseAdapter = new MyBaseAdapter(context,peiXiangInfos);
+        myBaseAdapter = new MyBaseAdapter(context, peiXiangInfos);
         mListView.setAdapter(myBaseAdapter);
         /*
         * 设置listview的item点击事件
@@ -205,7 +205,7 @@ public class QcodeActivity extends Activity {
 
 
     private void findViewById() {
-//        BT_save = (Button) findViewById(R.id.save_btn);
+        //        BT_save = (Button) findViewById(R.id.save_btn);
         BT_scan = (Button) findViewById(R.id.qcode_bt_scan);
         BT_stop = (Button) findViewById(R.id.qcode_bt_stop);
         //LV_RFID = (ListView) findViewById(R.id.list_qcdoe);
@@ -215,12 +215,12 @@ public class QcodeActivity extends Activity {
     }
 
     private void onClickListener() {
-//        BT_save.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                saveInDatabase();
-//            }
-//        });
+        //        BT_save.setOnClickListener(new View.OnClickListener() {
+        //            @Override
+        //            public void onClick(View view) {
+        //                saveInDatabase();
+        //            }
+        //        });
         BT_scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -309,6 +309,7 @@ public class QcodeActivity extends Activity {
                 .setPositiveButton("确认", null)
                 .show();
         hideWaitDialog();
+        dbManager.cleanPeiXiang();
     }
 
     /**
@@ -322,14 +323,14 @@ public class QcodeActivity extends Activity {
         if (!peiXiangInfos.isEmpty()) {
             if (db.addPeiXiang(peiXiangInfos)) {
                 hideWaitDialog();
-//                Toast.makeText(context, "保存成功!", Toast.LENGTH_SHORT).show();
+                //                Toast.makeText(context, "保存成功!", Toast.LENGTH_SHORT).show();
             } else {
                 hideWaitDialog();
-//                Toast.makeText(context, "保存失败!", Toast.LENGTH_SHORT).show();
+                //                Toast.makeText(context, "保存失败!", Toast.LENGTH_SHORT).show();
             }
         } else {
             hideWaitDialog();
-//            Toast.makeText(context, "数据为空!", Toast.LENGTH_SHORT).show();
+            //            Toast.makeText(context, "数据为空!", Toast.LENGTH_SHORT).show();
         }
 
 
@@ -420,9 +421,9 @@ public class QcodeActivity extends Activity {
             String rfid = (String) entry.getKey();
 
             DBManager db = new DBManager(context);
-            Map<String,String> map = DataCach.getPdaLoginMsg().getAllPdaBoxsMap();
+            Map<String, String> map = DataCach.getPdaLoginMsg().getAllPdaBoxsMap();
             String boxName = map.get(rfid);
-//            String boxName = db.queryCashBoxName(rfid);
+            //            String boxName = db.queryCashBoxName(rfid);
             if (boxName != null && !boxName.equals("")) {
                 String[] strings = boxName.split("&");
                 String boxName1 = strings[0];

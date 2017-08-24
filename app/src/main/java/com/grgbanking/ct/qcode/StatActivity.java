@@ -81,7 +81,6 @@ public class StatActivity extends Activity {
                 if (resultInfo.getCode().equals(resultInfo.CODE_SUCCESS)) {
                     //成功
                     JSONObject jsonObject = resultInfo.getJsonObject();
-                    Toast.makeText(getApplicationContext(), resultInfo.getMessage(), Toast.LENGTH_SHORT).show();
                     if (jsonObject != null && jsonObject.length() > 0) {
                         QcodeEntity qcodeEntity = QcodeEntity.JSONtoQcodeEntity(jsonObject);
                     }
