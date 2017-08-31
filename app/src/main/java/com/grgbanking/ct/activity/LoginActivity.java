@@ -64,7 +64,7 @@ import static com.grgbanking.ct.utils.IntenetUtil.NETWORN_WIFI;
 
 public class LoginActivity extends Activity {
     private static String TAG = "LoginActivity";
-    //获取当·前时间戳
+    //获取当前时间戳
     String date = FileUtil.getDate();
     String flag;//登录的状态
     String loginNameViewValue = null; //UI控件内容
@@ -97,6 +97,8 @@ public class LoginActivity extends Activity {
     private Context context;
 
     private LoginUtil loginUtil;
+    private String fileName;
+
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @SuppressLint("SdCardPath")
@@ -160,45 +162,55 @@ public class LoginActivity extends Activity {
         loginButtonView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //判断有无文件
-                boolean isExist = FileUtil.isExist(FILE_PATH + date + "WDRW.dat");
-                if (isExist) {
-                    /**
-                     *  显示一个进度条,提示当前解析进度.
-                     *  添加一个异步任务,用来解析“.dat”文件,并且写入数据库
-                     */
+                // FIXME: 2017/8/30 如果是金库,则读取另外一个文件。
+                //判断是否有金库文件
+                if (FileUtil.isExist(FILE_PATH + "WDRW.dat")) {
+                    //如果有
+                    fileName = "WDRW.dat";
                     mAsyncTask mAsyncTask = new mAsyncTask();
                     mAsyncTask.execute();
                 } else {
-                    ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
-                    showWaitingDialog(progressDialog, "提示", "未发现今日文件！", true);
+                    //判断有无文件
+                    boolean isExist = FileUtil.isExist(FILE_PATH + date + "WDRW.dat");
+                    if (isExist) {
+                        fileName = date + "WDRW.dat";
+                        /**
+                         *  显示一个进度条,提示当前解析进度.
+                         *  添加一个异步任务,用来解析“.dat”文件,并且写入数据库
+                         */
+                        mAsyncTask mAsyncTask = new mAsyncTask();
+                        mAsyncTask.execute();
+                    } else {
+                        ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+                        showWaitingDialog(progressDialog, "提示", "未发现今日文件！", true);
+                    }
                 }
+
             }
 
         });
 
-        //记住密码操作
-        remPasswordView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        loginNameView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loginNameView.setText("");
-            }
-        });
-
-        passwordView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                passwordView.setText("");
-            }
-        });
+        //        //记住密码操作
+        //        remPasswordView.setOnClickListener(new OnClickListener() {
+        //            @Override
+        //            public void onClick(View v) {
+        //
+        //            }
+        //        });
+        //
+        //        loginNameView.setOnClickListener(new OnClickListener() {
+        //            @Override
+        //            public void onClick(View v) {
+        //                loginNameView.setText("");
+        //            }
+        //        });
+        //
+        //        passwordView.setOnClickListener(new OnClickListener() {
+        //            @Override
+        //            public void onClick(View v) {
+        //                passwordView.setText("");
+        //            }
+        //        });
     }
 
     /**
@@ -470,13 +482,10 @@ public class LoginActivity extends Activity {
 
             try {
                 resultInfo = (com.hlct.framework.pda.common.entity.ResultInfo)
-                        FileUtil.readString(FILE_PATH + date + "WDRW.dat");
+                        FileUtil.readString(FILE_PATH + fileName);
             } catch (Exception e) {
                 e.printStackTrace();
-                FileUtil.writeString(FILE_PATH + "错误报告.dat", "" + e, "GBK");
-            }//冲销
-
-
+            }
             try {
                 /** 开始组装数据*/
 
