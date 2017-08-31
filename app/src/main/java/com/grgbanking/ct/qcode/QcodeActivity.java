@@ -66,8 +66,6 @@ public class QcodeActivity extends Activity {
     private ArrayList<Map<String, Object>> listitem;
     private Context context;
     private Button BT_scan;
-    private Button BT_stop;
-    private Button BT_save;
     private ListView LV_RFID;
     private Map<String, Integer> data;
     private boolean Scanflag = false;
