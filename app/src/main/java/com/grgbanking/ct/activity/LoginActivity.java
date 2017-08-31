@@ -162,7 +162,6 @@ public class LoginActivity extends Activity {
         loginButtonView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                // FIXME: 2017/8/30 如果是金库,则读取另外一个文件。
                 //判断是否有金库文件
                 if (FileUtil.isExist(FILE_PATH + "WDRW.dat")) {
                     //如果有

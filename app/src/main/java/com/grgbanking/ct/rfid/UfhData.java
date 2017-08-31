@@ -21,7 +21,7 @@ public class UfhData {
     public static Map<String, byte[]> epcBytes = new HashMap<String, byte[]>();
     public static boolean SoundFlag = false;//¿ØÖÆ¶Á¿¨ÐÅºÅ
     public static boolean SoundTimer = false;//·¢Éù¿ª¹Ø£¬´ò¿ªÁË¶Áµ½ÐÅºÅ¾Í·¢Éù
-    public static Timer timer;
+    private static Timer timer;
     static SoundPool soundpool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100);
     static ExecutorService soundThread = Executors.newSingleThreadExecutor();
     static int soundid = soundpool.load("/etc/Scan_new.ogg", 1);

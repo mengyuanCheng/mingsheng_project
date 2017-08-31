@@ -8,8 +8,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/qcode_linear_bottom"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <RelativeLayout
             android:id="@+id/qcode_title"
@@ -36,16 +38,16 @@
                 android:layout_marginTop="10dp"
                 android:text="@string/peixiang"/>
 
-            <Button
-                android:id="@+id/qcode_bt_stop"
-                style="@style/buttonText"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:background="#3695E2"
-                android:text="@string/stop"
-                tools:ignore="RelativeOverlap"/>
+            <!--<Button-->
+                <!--android:id="@+id/qcode_bt_stop"-->
+                <!--style="@style/buttonText"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="50dp"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:background="#3695E2"-->
+                <!--android:text="@string/stop"-->
+                <!--tools:ignore="RelativeOverlap"/>-->
 
         </RelativeLayout>
 
@@ -81,7 +83,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_weight="1"
-            android:text="上传数据"/>
+            android:text="生成文件"/>
     </LinearLayout>
 
 

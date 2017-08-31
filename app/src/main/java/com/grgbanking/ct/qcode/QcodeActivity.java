@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -35,9 +37,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static android.util.Log.d;
 import static com.grgbanking.ct.cach.DataCach.loginUser;
-import static com.grgbanking.ct.rfid.UfhData.timer;
 
 /**
  * @author ：     cmy
@@ -46,6 +46,7 @@ import static com.grgbanking.ct.rfid.UfhData.timer;
  * @Description :
  */
 public class QcodeActivity extends Activity {
+    private static final String TAG = "QcodeActivity";
     /**
      * 定义文件路径
      */
@@ -58,6 +59,7 @@ public class QcodeActivity extends Activity {
      * 定义文件名
      */
     private static final String FILE_NAME = "PX";
+    private static final int MSG_UPDATE_LISTVIEW = 0;
     //用来存放更新后的数据
     private HashMap<String, List> reFreshDataMap = new HashMap();
     private SimpleAdapter listItemAdapter;
@@ -74,6 +76,8 @@ public class QcodeActivity extends Activity {
     private ArrayList<String> QRcodelist;
     private String rfidNum;
     private ProgressDialog pd = null;
+    private Handler mHandler;
+    private Timer timer;
 
     ArrayList<PeiXiangInfo> peiXiangInfos = new ArrayList<>();
     /*-------------------------lzy 新建------------------------*/
@@ -130,7 +134,7 @@ public class QcodeActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("position ----->", "" + position);
-                //TODO 判断要访问的数据是否存在 QRCode_list , 如果存在带着数据跳转
+                //TODO 判断要访问的数据是否存在QRCode_list,如果存在带着数据跳转
 
                 if (peiXiangInfos != null && peiXiangInfos.size() >= position + 1) {
                     PeiXiangInfo peiXiangInfo = peiXiangInfos.get(position);
@@ -190,7 +194,7 @@ public class QcodeActivity extends Activity {
             mRFIDCodes.add(peiXiangInfos.get(i).getBoxNum());
             mBoxNameList.add(peiXiangInfos.get(i).getBoxName());
         }
-
+        updataItem();
 
     }
 
@@ -207,7 +211,7 @@ public class QcodeActivity extends Activity {
     private void findViewById() {
         //        BT_save = (Button) findViewById(R.id.save_btn);
         BT_scan = (Button) findViewById(R.id.qcode_bt_scan);
-        BT_stop = (Button) findViewById(R.id.qcode_bt_stop);
+//        BT_stop = (Button) findViewById(R.id.qcode_bt_stop);
         //LV_RFID = (ListView) findViewById(R.id.list_qcdoe);
         BT_upDate = (Button) findViewById(R.id.qcode_update_bt);
         /*-----------------------------------------------------*/
@@ -224,21 +228,25 @@ public class QcodeActivity extends Activity {
         BT_scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (BT_scan.getText().equals("扫描")) {
+                    connDevices();
+                    startDevices();
+                } else if (BT_scan.getText().equals("停止")) {
+                    cancelScan();
+                    UfhData.Set_sound(false);
+                }
 
-                connDevices();
-                startDevices();
-                updataItem();
             }
         });
 
-        BT_stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //  2016/10/25 停止扫描
-                cancelScan();
-                UfhData.Set_sound(false);
-            }
-        });
+//        BT_stop.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                //  2016/10/25 停止扫描
+//                cancelScan();
+//                UfhData.Set_sound(false);
+//            }
+//        });
         BT_upDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -353,59 +361,60 @@ public class QcodeActivity extends Activity {
      *
      * @return HashMap, rfid+rfid.
      */
-    private Map<String, String> startDevices() {
-        StringBuffer sb = new StringBuffer();
-        HashMap<String, String> keymap = new HashMap<>();
-        UfhData.Set_sound(true);
-        UfhData.SoundFlag = true;
+    private void startDevices() {
         if (!UfhData.isDeviceOpen()) {
             Toast.makeText(this, R.string.detail_title, Toast.LENGTH_LONG).show();
-            return null;
+            return;
         }
-        UfhData.read6c();
-        data = UfhData.scanResult6c;
-        Iterator it = data.keySet().iterator();
-        while (it.hasNext()) {
-            String s = it.next().toString();
-            keymap.put(s, s);
-            d("!!!", s);
+        try {
+            if (timer == null) {
+                UfhData.Set_sound(true);
+                UfhData.SoundFlag = true;
+
+                isCanceled = false;
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (Scanflag)
+                            return;
+                        Scanflag = true;
+                        UfhData.read6c();
+                        if (mHandler!=null){
+                            mHandler.removeMessages(MSG_UPDATE_LISTVIEW);
+                            mHandler.sendEmptyMessage(MSG_UPDATE_LISTVIEW);
+                            Scanflag = false;
+                        }
+
+                    }
+                }, 0, 10);
+                BT_scan.setText("停止");
+            } else {
+                cancelScan();
+                UfhData.Set_sound(false);
+            }
+        } catch (Exception e) {
+
         }
-
-        if (timer == null) {
-            UfhData.Set_sound(true);
-            UfhData.SoundFlag = true;
-
-            isCanceled = false;
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (Scanflag)
-                        return;
-                    Scanflag = true;
-                    UfhData.read6c();
-                    Scanflag = false;
-                }
-            }, 0, 10);
-        } else {
-
-        }
-        UfhData.Set_sound(true);
-        return keymap;
-
     }
 
     /**
      * 取消扫描
      */
     private void cancelScan() {
-        isCanceled = true;
-        //mHandler.removeMessages(MSG_UPDATE_LISTVIEW);
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-            UfhData.scanResult6c.clear();
+        try {
+            isCanceled = true;
+            mHandler.removeMessages(MSG_UPDATE_LISTVIEW);
+            if (timer != null) {
+                timer.cancel();
+                timer = null;
+                UfhData.scanResult6c.clear();
+                BT_scan.setText("扫描");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     /**
@@ -413,32 +422,44 @@ public class QcodeActivity extends Activity {
      * 更新 item
      */
     private void updataItem() {
-        Map<String, String> keymap = startDevices();
-        Iterator it = keymap.entrySet().iterator();
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case MSG_UPDATE_LISTVIEW:
+                        //data中存放Pda扫描上来的数据
+                        data = UfhData.scanResult6c;
+                        Iterator it = data.entrySet().iterator();
+                        while (it.hasNext()) {
+                            Map.Entry entry = (Map.Entry) it.next();
+                            String rfid = (String) entry.getKey();
+                            Log.e(TAG, "updataItem: " + rfid);
 
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String rfid = (String) entry.getKey();
+                            DBManager db = new DBManager(context);
+                            Map<String, String> map = DataCach.getPdaLoginMsg().getAllPdaBoxsMap();
+                            String boxName = map.get(rfid);
+                            Log.e(TAG, "updataItem: " + boxName);
+                            //            String boxName = db.queryCashBoxName(rfid);
+                            if (boxName != null && !boxName.equals("")) {
+                                String[] strings = boxName.split("&");
+                                String boxName1 = strings[0];
+                                if (!mBoxNameList.contains(boxName1)) {
+                                    mBoxNameList.add(0, boxName1);
+                                    mRFIDCodes.add(0, rfid);
+                                    PeiXiangInfo peiXiangInfo = new PeiXiangInfo(rfid, boxName1);
+                                    peiXiangInfos.add(0, peiXiangInfo);
+                                }
+                            }
+                        }
+                        myBaseAdapter.notifyDataSetChanged();
+                        break;
 
-            DBManager db = new DBManager(context);
-            Map<String, String> map = DataCach.getPdaLoginMsg().getAllPdaBoxsMap();
-            String boxName = map.get(rfid);
-            //            String boxName = db.queryCashBoxName(rfid);
-            if (boxName != null && !boxName.equals("")) {
-                String[] strings = boxName.split("&");
-                String boxName1 = strings[0];
-                if (!mBoxNameList.contains(boxName1)) {
-                    mBoxNameList.add(0, boxName1);
-                    mRFIDCodes.add(0, rfid);
-                    PeiXiangInfo peiXiangInfo = new PeiXiangInfo(rfid, boxName1);
-                    peiXiangInfos.add(0, peiXiangInfo);
+                    default:
+                        break;
                 }
+                super.handleMessage(msg);
             }
-
-
-        }
-
-        myBaseAdapter.notifyDataSetChanged();
+        };
 
     }
 
@@ -508,5 +529,11 @@ public class QcodeActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-
+    //切换时取消扫描
+    @Override
+    protected void onPause() {
+        cancelScan();
+        UfhData.Set_sound(false);
+        super.onPause();
+    }
 }
