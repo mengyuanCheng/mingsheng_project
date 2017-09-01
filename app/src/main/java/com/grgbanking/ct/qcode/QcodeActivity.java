@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.grgbanking.ct.cach.DataCach.barcodeList;
 import static com.grgbanking.ct.cach.DataCach.loginUser;
 
 /**
@@ -189,6 +190,12 @@ public class QcodeActivity extends Activity {
         DBManager dbdb = new DBManager(this);
         peiXiangInfos = dbdb.queryPeiXiang();
         for (int i = 0; i < peiXiangInfos.size(); i++) {
+            List codelist = peiXiangInfos.get(i).getQR_codelist();
+            if (codelist != null) {
+                for (int j = 0; j < codelist.size(); j++) {
+                    barcodeList.add((String) codelist.get(j));
+                }
+            }
             mRFIDCodes.add(peiXiangInfos.get(i).getBoxNum());
             mBoxNameList.add(peiXiangInfos.get(i).getBoxName());
         }
@@ -209,7 +216,7 @@ public class QcodeActivity extends Activity {
     private void findViewById() {
         //        BT_save = (Button) findViewById(R.id.save_btn);
         BT_scan = (Button) findViewById(R.id.qcode_bt_scan);
-//        BT_stop = (Button) findViewById(R.id.qcode_bt_stop);
+        //        BT_stop = (Button) findViewById(R.id.qcode_bt_stop);
         //LV_RFID = (ListView) findViewById(R.id.list_qcdoe);
         BT_upDate = (Button) findViewById(R.id.qcode_update_bt);
         /*-----------------------------------------------------*/
@@ -237,14 +244,14 @@ public class QcodeActivity extends Activity {
             }
         });
 
-//        BT_stop.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //  2016/10/25 停止扫描
-//                cancelScan();
-//                UfhData.Set_sound(false);
-//            }
-//        });
+        //        BT_stop.setOnClickListener(new View.OnClickListener() {
+        //            @Override
+        //            public void onClick(View v) {
+        //                //  2016/10/25 停止扫描
+        //                cancelScan();
+        //                UfhData.Set_sound(false);
+        //            }
+        //        });
         BT_upDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -260,7 +267,7 @@ public class QcodeActivity extends Activity {
      * 生成文件导出
      */
     private void commitData() {
-
+        boolean flag = true;
         StringBuffer sb = new StringBuffer();
         sb.append("{").append("GUARD_CODE:").append(loginUser.getLoginName()).append(",BOXRFIDQR: [");
         DBManager dbManager = new DBManager(this);
@@ -275,6 +282,7 @@ public class QcodeActivity extends Activity {
                 Log.i("tmp3===", "" + tmp3);
                 sb.append("{BOXRFID:").append(px.getBoxNum()).append(",QRCODE:").append(tmp3).append("},");
             } else {
+                flag = false;
                 sb.append("{BOXRFID:").append(px.getBoxNum()).append(",QRCODE:").append("").append("},");
             }
 
@@ -300,22 +308,32 @@ public class QcodeActivity extends Activity {
         String tmp = sb.toString().substring(0, sb.toString().length() - 1) + "]}";
         Log.i("====tmp==", "" + tmp);
 
-        //将数据写入SD卡
-        String date = FileUtil.getDate();
-        String addr = FileUtil.createIfNotExist(FILE_PATH + FILE_NAME + date + FILE_FORMAT);
+        if (flag == true) {
+            //将数据写入SD卡
+            String date = FileUtil.getDate();
+            String addr = FileUtil.createIfNotExist(FILE_PATH + FILE_NAME + date + FILE_FORMAT);
 
-        byte[] writebytes = new byte[0];
-        FileUtil.strToByteArray(tmp);
-        FileUtil.writeBytes(addr, writebytes);
-        FileUtil.writeString(addr, tmp, "utf-8");
-        FileUtil.makeFileAvailable(context, addr);
-        new AlertDialog.Builder(context)
-                .setTitle("提示信息")
-                .setMessage("生成文件成功")
-                .setPositiveButton("确认", null)
-                .show();
-        hideWaitDialog();
-        dbManager.cleanPeiXiang();
+            byte[] writebytes = new byte[0];
+            FileUtil.strToByteArray(tmp);
+            FileUtil.writeBytes(addr, writebytes);
+            FileUtil.writeString(addr, tmp, "utf-8");
+            FileUtil.makeFileAvailable(context, addr);
+            new AlertDialog.Builder(context)
+                    .setTitle("提示信息")
+                    .setMessage("生成文件成功")
+                    .setPositiveButton("确认", null)
+                    .show();
+            hideWaitDialog();
+            dbManager.cleanPeiXiang();
+            DataCach.clearAllDataCach();
+        } else {
+            new AlertDialog.Builder(context)
+                    .setTitle("提示信息")
+                    .setMessage("空箱包无法提交")
+                    .setPositiveButton("确认", null)
+                    .show();
+        }
+
     }
 
     /**
@@ -378,7 +396,7 @@ public class QcodeActivity extends Activity {
                             return;
                         Scanflag = true;
                         UfhData.read6c();
-                        if (mHandler!=null){
+                        if (mHandler != null) {
                             mHandler.removeMessages(MSG_UPDATE_LISTVIEW);
                             mHandler.sendEmptyMessage(MSG_UPDATE_LISTVIEW);
                             Scanflag = false;

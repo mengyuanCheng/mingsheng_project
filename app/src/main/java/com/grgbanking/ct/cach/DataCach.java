@@ -4,8 +4,10 @@ import com.grgbanking.ct.entity.LoginUser;
 import com.grgbanking.ct.entity.PdaLoginMsg;
 import com.hlct.framework.business.message.entity.PdaLoginMessage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * 添加DataCach数据时注意更新clearAllDataCach()方法
@@ -25,6 +27,7 @@ public class DataCach {
     public static PdaLoginMsg pdaLoginMsg = null;
     public static HashMap<String, String> codeMap = new HashMap<String, String>();
     public static HashMap<String, Object> qcodeMap = new HashMap();
+    public static List<String> barcodeList = new ArrayList<>();
     private static PdaLoginMessage pdaLoginMessage = null;
 
     public static PdaLoginMsg getPdaLoginMsg() {
@@ -53,6 +56,7 @@ public class DataCach {
      * 清空缓存
      */
     public static void clearAllDataCach() {
+        barcodeList.clear();
         netType = "";
         taskMap = null;
         taskMap = new LinkedHashMap<String, HashMap<String, Object>>();

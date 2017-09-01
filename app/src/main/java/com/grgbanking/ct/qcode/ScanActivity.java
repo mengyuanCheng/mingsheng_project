@@ -26,6 +26,8 @@ import com.grgbanking.ct.activity.MApplication;
 
 import java.util.ArrayList;
 
+import static com.grgbanking.ct.cach.DataCach.barcodeList;
+
 /**
  * @author ：     cmy
  * @version :     2016/11/11.
@@ -75,11 +77,13 @@ public class ScanActivity extends Activity {
 
             String barcodeStr = intent.getStringExtra("barcode_string");//直接获取字符串
             showScanResult.setText(barcodeStr);
-            if (mArrayList.contains(barcodeStr)) {
+            if (mArrayList.contains(barcodeStr) || barcodeList.contains(barcodeStr)) {
                 Toast.makeText(ScanActivity.this, "扫描结果已经存在", Toast.LENGTH_SHORT).show();
                 return;
             } else {
+                barcodeList.add(barcodeStr);
                 mArrayList.add(barcodeStr);
+                Log.e("ScanActivity", "onReceive: " + barcodeStr);
                 if (mArrayAdapter != null) {
                     mArrayAdapter.notifyDataSetChanged();
                 }
@@ -97,7 +101,7 @@ public class ScanActivity extends Activity {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.sacn_activity);
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        context  = ScanActivity.this;
+        context = ScanActivity.this;
         setupView();
         getInfo();
     }
@@ -112,29 +116,29 @@ public class ScanActivity extends Activity {
 
     private void setupView() {
         showScanResult = (TextView) findViewById(R.id.scan_result);
-        btn = (Button) findViewById(R.id.manager);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                saveData();
-               /* DataCach.codeMap.put("" + count, barcodeStr);
-                DataCach.qcodeMap.put(rfidNum, DataCach.codeMap);
-                count++;
-                if (barcodeStr != null) {
-                    if (QRcodelist.size() < 5) {
-                        QRcodelist.add(barcodeStr);
-                        showTextToast("保存成功！");
-                        //                        Toast.makeText(ScanActivity.this, "保存成功！", Toast.LENGTH_SHORT).show();
-                    } else {
-                        showTextToast("您最多可保存5个二维码");
-                        //                        Toast.makeText(ScanActivity.this, "您最多可保存5个二维码", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    showTextToast("未检测到任何二维码数据，请重新扫描！");
-                    //                    Toast.makeText(ScanActivity.this, "未检测到任何二维码数据，请重新扫描！", Toast.LENGTH_SHORT).show();
-                }*/
-            }
-        });
+        //        btn = (Button) findViewById(R.id.manager);
+        //        btn.setOnClickListener(new View.OnClickListener() {
+        //            @Override
+        //            public void onClick(View arg0) {
+        //                saveData();
+        //               /* DataCach.codeMap.put("" + count, barcodeStr);
+        //                DataCach.qcodeMap.put(rfidNum, DataCach.codeMap);
+        //                count++;
+        //                if (barcodeStr != null) {
+        //                    if (QRcodelist.size() < 5) {
+        //                        QRcodelist.add(barcodeStr);
+        //                        showTextToast("保存成功！");
+        //                        //                        Toast.makeText(ScanActivity.this, "保存成功！", Toast.LENGTH_SHORT).show();
+        //                    } else {
+        //                        showTextToast("您最多可保存5个二维码");
+        //                        //                        Toast.makeText(ScanActivity.this, "您最多可保存5个二维码", Toast.LENGTH_SHORT).show();
+        //                    }
+        //                } else {
+        //                    showTextToast("未检测到任何二维码数据，请重新扫描！");
+        //                    //                    Toast.makeText(ScanActivity.this, "未检测到任何二维码数据，请重新扫描！", Toast.LENGTH_SHORT).show();
+        //                }*/
+        //            }
+        //        });
         mScan = (Button) findViewById(R.id.scan);
         mScan.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,17 +159,19 @@ public class ScanActivity extends Activity {
         mClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                saveData();
                 mScanManager.stopDecode();
             }
         });
 
         /*-----------------------------------------------------------*/
         mListView = (ListView) findViewById(R.id.scan_listview);
-        mArrayAdapter = new ArrayAdapter(context,R.layout.array_listview_item_view,
-                R.id.array_listview_textview,mArrayList);
+        mArrayAdapter = new ArrayAdapter(context, R.layout.array_listview_item_view,
+                R.id.array_listview_textview, mArrayList);
         mListView.setAdapter(mArrayAdapter);
 
     }
+
     /*
     * 按保存按钮的时候
     * */
@@ -174,7 +180,7 @@ public class ScanActivity extends Activity {
         Bundle bundle = new Bundle();
         bundle.putStringArrayList("list", mArrayList);
         commitIntent.putExtra("bundle", bundle);
-        this.setResult(RESULT_CODE_SCAN,commitIntent);
+        this.setResult(RESULT_CODE_SCAN, commitIntent);
         finish();
     }
 

@@ -24,12 +24,12 @@ import static com.grgbanking.ct.qcode.ScanActivity.REQUEST_CODE_SCAN;
 /**
  * @author lazylee
  * @Description 用于显示rfid对应的款箱二维码结果列表
- *              通过跳转到扫描界面获取二维码数据数据
- *              保存信息将信息返回给 QcodeActivity
- *
+ * 通过跳转到扫描界面获取二维码数据数据
+ * 保存信息将信息返回给 QcodeActivity
  */
-public class ScanQRCodeActivity extends Activity implements View.OnClickListener{
+public class ScanQRCodeActivity extends Activity implements View.OnClickListener {
 
+    private static final String TAG = "ScanQRCodeActivity";
     private Context mContext;
     private ListView mListView;     // list列表
     private Button mBtnScanQRCode;  // 扫描按钮
@@ -37,6 +37,7 @@ public class ScanQRCodeActivity extends Activity implements View.OnClickListener
     private int mFlag;
     ArrayList<String> mArrayList = new ArrayList<>();
     ArrayAdapter mArrayAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,11 +45,11 @@ public class ScanQRCodeActivity extends Activity implements View.OnClickListener
         Intent intent = getIntent();
         mFlag = intent.getFlags();
 
-        if(intent.getBundleExtra("bundle") != null){
+        if (intent.getBundleExtra("bundle") != null) {
             Bundle bundle = intent.getBundleExtra("bundle");
             mArrayList = (ArrayList<String>) bundle.getSerializable("list");
-            if(mArrayList != null){
-                Log.i("ScanQRCodeActivity->",mArrayList.toString());
+            if (mArrayList != null) {
+                Log.i("ScanQRCodeActivity->", mArrayList.toString());
             }
         }
 
@@ -59,13 +60,13 @@ public class ScanQRCodeActivity extends Activity implements View.OnClickListener
         mBtnSaveData = (Button) findViewById(R.id.scan_btn_save_data);
         mBtnSaveData.setOnClickListener(this);
 
-        mArrayAdapter = new ArrayAdapter(mContext,R.layout.array_listview_item_view,
-                R.id.array_listview_textview,mArrayList);
+        mArrayAdapter = new ArrayAdapter(mContext, R.layout.array_listview_item_view,
+                R.id.array_listview_textview, mArrayList);
         mListView.setAdapter(mArrayAdapter);
 
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view,final int position, long id) {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
 
                 new AlertDialog.Builder(mContext)
                         .setTitle("提示")
@@ -89,12 +90,11 @@ public class ScanQRCodeActivity extends Activity implements View.OnClickListener
         });
 
 
-
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             /*扫描二维码*/
             case R.id.scan_btn_qrcode:
                 Intent intent = new Intent(mContext, ScanActivity.class);
@@ -107,13 +107,14 @@ public class ScanQRCodeActivity extends Activity implements View.OnClickListener
                 Bundle bundle = new Bundle();
                 bundle.putStringArrayList("list", mArrayList);
                 commitIntent.putExtra("bundle", bundle);
-                this.setResult(QcodeActivity.RESULT_CODE,commitIntent);
+                this.setResult(QcodeActivity.RESULT_CODE, commitIntent);
                 finish();
                 break;
             default:
                 break;
         }
     }
+
     /**
      * 处理扫描返回的结果
      *
@@ -124,7 +125,7 @@ public class ScanQRCodeActivity extends Activity implements View.OnClickListener
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_SCAN) {
-            switch (resultCode){
+            switch (resultCode) {
                 case ScanActivity.RESULT_CODE_SCAN:
                     Bundle bundle = data.getBundleExtra("bundle");
                     ArrayList<String> list = bundle.getStringArrayList("list");
