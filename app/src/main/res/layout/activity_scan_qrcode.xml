@@ -27,18 +27,19 @@
     </ListView>
 
     <Button
+        android:layout_margin="4dp"
         android:id="@+id/scan_btn_qrcode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FB7F2C"
+        android:background="@drawable/shape"
         android:text="扫描二维码"/>
 
     <Button
         android:id="@+id/scan_btn_save_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:background="#FB7F2C"
+        android:layout_margin="4dp"
+        android:background="@drawable/shape"
         android:text="保存数据"/>
 
 </LinearLayout>

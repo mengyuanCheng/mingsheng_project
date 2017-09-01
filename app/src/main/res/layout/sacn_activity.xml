@@ -3,8 +3,9 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
+              android:background="#ffffff"
               android:gravity="center"
-              android:orientation="vertical" >
+              android:orientation="vertical">
 
     <TextView
         android:id="@+id/wcccamera_title"
@@ -19,10 +20,11 @@
         android:id="@+id/scan_result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
         android:layout_marginTop="20dp"
         android:gravity="center"
-        android:hint="二维码信息" />
+        android:hint="二维码信息"
+        android:padding="8dp"/>
+
     <ListView
         android:id="@+id/scan_listview"
         android:layout_width="match_parent"
@@ -31,21 +33,27 @@
         android:divider="@color/light_grey"
         android:dividerHeight="1dp"
         ></ListView>
+
     <Button
+        android:layout_margin="4dp"
         android:id="@+id/scan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="开始扫描"
-        android:contentDescription="保存信息"/>
+        android:background="@drawable/shape"
+        android:contentDescription="保存信息"
+        android:text="开始扫描"/>
+
     <Button
+        android:layout_margin="4dp"
         android:id="@+id/close"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="关闭扫描" />
+        android:background="@drawable/shape"
+        android:text="关闭扫描"/>
     <!--<Button-->
-        <!--android:id="@+id/manager"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="保存信息" />-->
+    <!--android:id="@+id/manager"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="保存信息" />-->
 
 </LinearLayout>
