@@ -46,6 +46,7 @@ public class PdaNetInfo implements Serializable {
                     info.setBankId((String) jsonArray.getJSONObject(i).get("bankId"));
                     info.setBankName((String) jsonArray.getJSONObject(i).get("bankName"));
                     info.setNetTaskStatus((String) jsonArray.getJSONObject(i).get("netTaskStatus"));
+                    info.setFlag((String) jsonArray.getJSONObject(i).get("flag"));
 
                     JSONArray cashBoxInfoArray = ((JSONArray) jsonArray.getJSONObject(i).get("cashBoxInfoList"));
                     List<PdaCashboxInfo> cashBoxInfoList = PdaCashboxInfo.JSONArraytoPdaNetInfo(cashBoxInfoArray);

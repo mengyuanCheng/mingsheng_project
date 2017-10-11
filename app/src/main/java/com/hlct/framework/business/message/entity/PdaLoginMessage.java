@@ -1,10 +1,14 @@
 package com.hlct.framework.business.message.entity;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +41,10 @@ public class PdaLoginMessage implements Serializable {
                 plm.setCode(jsonObject.getString("code"));
                 plm.setMessage(jsonObject.getString("message"));
 
+                JSONArray loginManInfoArray = jsonObject.getJSONArray("pdaLoginManInfo");
+                List<PdaUserInfo> userInfolist = PdaUserInfo.JSONArraytoPdaLoginManInfo(loginManInfoArray);
+                plm.setPdaLoginManInfo(userInfolist);
+
                 JSONArray netInfoArray = jsonObject.getJSONArray("netInfoList");
                 List<PdaNetInfo> netInfoList = PdaNetInfo.JSONArraytoPdaNetInfo(netInfoArray);
                 plm.setNetInfoList(netInfoList);
@@ -45,9 +53,22 @@ public class PdaLoginMessage implements Serializable {
                 List<PdaGuardManInfo> guardManInfoList = PdaGuardManInfo.JSONArraytoPdaGuardManInfo(guardManInfoArray);
                 plm.setGuardManInfoList(guardManInfoList);
 
-                JSONArray allPdaBoxsArray = jsonObject.getJSONArray("allPdaBoxsList");
-                Map<String, String> allPdaBoxsMap = PdaCashboxInfo.JSONArraytoPdaNetInfoMap(allPdaBoxsArray);
+                JSONObject allPdaBoxsObj = jsonObject.getJSONObject("allPdaBoxsMap");
+
+                Iterator iterator = allPdaBoxsObj.keys();
+                String key, value;
+                Map<String, String> allPdaBoxsMap = new HashMap<>();
+                while (iterator.hasNext()) {
+                    key = (String) iterator.next();
+                    Log.d("test", "key: " + key);
+                    value = allPdaBoxsObj.getString(key);
+                    Log.d("test", "value: " + value);
+                    allPdaBoxsMap.put(key, value);
+                }
                 plm.setAllPdaBoxsMap(allPdaBoxsMap);
+
+                //                Map<String, String> allPdaBoxsMap = PdaCashboxInfo.JSONArraytoPdaNetInfoMap(allPdaBoxsArray);
+                //                                plm.setAllPdaBoxsMap(allPdaBoxsMap);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

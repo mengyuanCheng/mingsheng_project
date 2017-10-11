@@ -3,6 +3,8 @@ package com.grgbanking.ct.http;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.hlct.framework.business.message.entity.PdaLoginMessage;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -49,12 +51,14 @@ public class HttpPostUtils extends AsyncTask<Object, Integer, ResultInfo> {
             HttpResponse httpResponse = client.execute(httpPost);
             if (httpResponse.getStatusLine().getStatusCode() == 200) {
                 String string = EntityUtils.toString(httpResponse.getEntity(), HTTP.UTF_8);
+                Log.d("test", "post: "+string);
                 JSONObject jsonObject = new JSONObject(string);
                 //				JSONObject jsonObject = JSONObject.fromObject(string);
                 resultInfo.setCode(jsonObject.getString("code"));
-                resultInfo.setJsonArray(jsonObject.getJSONArray("jsonArray"));
-                resultInfo.setJsonObject(jsonObject.getJSONObject("jsonObject"));
+//                resultInfo.setJsonArray(jsonObject.getJSONArray("jsonArray"));
+//                resultInfo.setJsonObject(jsonObject.getJSONObject("jsonObject"));
                 resultInfo.setMessage(jsonObject.getString("message"));
+                resultInfo.setPdaLogMess(PdaLoginMessage.JSONtoPdaLoginMessage(jsonObject.getJSONObject("pdaLogMess")));
             }
         } catch (Exception e) {
             e.printStackTrace();

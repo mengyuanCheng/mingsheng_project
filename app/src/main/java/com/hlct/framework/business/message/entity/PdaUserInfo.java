@@ -1,7 +1,5 @@
 package com.hlct.framework.business.message.entity;
 
-import com.grgbanking.ct.entity.PdaLoginManInfo;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -24,19 +22,19 @@ public class PdaUserInfo implements Serializable{
     private String flag;
     private String line;
 
-    public static List<PdaLoginManInfo> JSONArraytoPdaLoginManInfo(JSONArray jsonArray) {
-        List<PdaLoginManInfo> list = null;
+    public static List<PdaUserInfo> JSONArraytoPdaLoginManInfo(JSONArray jsonArray) {
+        List<PdaUserInfo> list = null;
         if (jsonArray != null && jsonArray.length() > 0) {
-            list = new ArrayList<PdaLoginManInfo>();
+            list = new ArrayList<PdaUserInfo>();
 
             for (int i = 0; i < jsonArray.length(); i++) {
-                PdaLoginManInfo info = new PdaLoginManInfo();
+                PdaUserInfo info = new PdaUserInfo();
                 try {
                     info.setLoginId((String) jsonArray.getJSONObject(i).get("loginId"));
-                    info.setLogin_name((String) jsonArray.getJSONObject(i).get("login_name"));
                     info.setPassword((String) jsonArray.getJSONObject(i).get("password"));
                     info.setFlag((String) jsonArray.getJSONObject(i).get("flag"));
                     info.setLine((String) jsonArray.getJSONObject(i).get("line"));
+                    info.setLogin_name((String) jsonArray.getJSONObject(i).get("loginName"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

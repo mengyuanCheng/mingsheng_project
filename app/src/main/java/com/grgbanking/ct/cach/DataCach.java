@@ -40,7 +40,6 @@ public class DataCach {
         }
         DataCach.pdaLoginMsg = pdaLoginMsg;
     }
-
     public static PdaLoginMessage getPdaLoginMessage() {
         return DataCach.pdaLoginMessage;
     }

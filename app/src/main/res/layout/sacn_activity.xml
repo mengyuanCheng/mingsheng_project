@@ -32,22 +32,23 @@
         android:layout_weight="1"
         android:divider="@color/light_grey"
         android:dividerHeight="1dp"
-        ></ListView>
+        >
+    </ListView>
 
     <Button
-        android:layout_margin="4dp"
         android:id="@+id/scan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="4dp"
         android:background="@drawable/shape"
         android:contentDescription="保存信息"
         android:text="开始扫描"/>
 
     <Button
-        android:layout_margin="4dp"
         android:id="@+id/close"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="4dp"
         android:background="@drawable/shape"
         android:text="关闭扫描"/>
     <!--<Button-->

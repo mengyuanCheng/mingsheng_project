@@ -2,6 +2,7 @@ package com.grgbanking.ct.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 
 /**
  * @author ：     cmy
@@ -97,5 +98,14 @@ public class LoginUtil {
         return sp.getBoolean(key, false);
     }
 
+    /**
+     * 获取设备厂商
+     * <p>如Xiaomi</p>
+     *
+     * @return 设备厂商
+     */
 
+    public static String getManufacturer() {
+        return Build.MANUFACTURER;
+    }
 }

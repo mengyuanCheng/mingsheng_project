@@ -1,9 +1,11 @@
 package com.grgbanking.ct.http;
 
+import com.hlct.framework.business.message.entity.PdaLoginMessage;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class ResultInfo  {
+public class ResultInfo {
     /**
      * 配钞人员
      */
@@ -16,6 +18,7 @@ public class ResultInfo  {
     public static final String CODE_ERROR = "2";
     private String code;
     private String message;
+    private PdaLoginMessage pdaLogMess;
     /**
      * 数据信息
      */
@@ -23,8 +26,16 @@ public class ResultInfo  {
     private JSONArray jsonArray;
     private JSONObject jsonObject;
 
-    public ResultInfo(){
+    public ResultInfo() {
 
+    }
+
+    public PdaLoginMessage getPdaLogMess() {
+        return pdaLogMess;
+    }
+
+    public void setPdaLogMess(PdaLoginMessage pdaLogMess) {
+        this.pdaLogMess = pdaLogMess;
     }
 
     public String getCode() {
@@ -66,5 +77,6 @@ public class ResultInfo  {
     public void setJsonObject(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
     }
+
 
 }
