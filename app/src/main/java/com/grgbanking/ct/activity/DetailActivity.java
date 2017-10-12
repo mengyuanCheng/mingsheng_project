@@ -38,10 +38,8 @@ import com.grgbanking.ct.utils.FileUtil;
 import com.handheld.UHF.UhfManager;
 import com.hlct.framework.business.message.entity.PdaCashboxInfo;
 import com.hlct.framework.business.message.entity.PdaGuardManInfo;
-import com.hlct.framework.business.message.entity.PdaLoginMessage;
 import com.hlct.framework.business.message.entity.PdaNetInfo;
 import com.hlct.framework.business.message.entity.PdaNetPersonInfo;
-import com.hlct.framework.pda.common.entity.ResultInfo;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -386,23 +384,23 @@ public class DetailActivity extends Activity {
                                     map1.put("status", "1");
                                 }
                                 //判断是否是错误款箱RFID
-                                else if (boxesMap2.get(key) == null) {
-                                    ResultInfo resultInfo = new ResultInfo();
-                                    String date = FileUtil.getDate();
-                                    resultInfo = (ResultInfo) FileUtil.readString(FILE_PATH + date + "WDRW.dat");
-                                    PdaLoginMessage pda = resultInfo.getPdaLogMess();
-                                    Map<String, String> allPdaBoxsMap = pda.getAllPdaBoxsMap();
-                                    if (allPdaBoxsMap.get(key) != null) {
-                                        HashMap<String, Object> map1 = new HashMap<>();
-                                        map1.put("list_img", R.drawable.boxes_list_status_3);// 图像资源的ID
-                                        String string = allPdaBoxsMap.get(key);
-                                        String a[] = string.split("&");
-                                        map1.put("list_title", a[0]);
-                                        DataCach.boxesMap.put(key, map1);
-                                        boxesMap2.put(key, map1);
-                                        listItem.add(map1);
-                                    }
-                                }
+//                                else if (boxesMap2.get(key) == null) {
+//                                    ResultInfo resultInfo = new ResultInfo();
+//                                    String date = FileUtil.getDate();
+//                                    resultInfo = (ResultInfo) FileUtil.readString(FILE_PATH + date + "WDRW.dat");
+//                                    PdaLoginMessage pda = resultInfo.getPdaLogMess();
+//                                    Map<String, String> allPdaBoxsMap = pda.getAllPdaBoxsMap();
+//                                    if (allPdaBoxsMap.get(key) != null) {
+//                                        HashMap<String, Object> map1 = new HashMap<>();
+//                                        map1.put("list_img", R.drawable.boxes_list_status_3);// 图像资源的ID
+//                                        String string = allPdaBoxsMap.get(key);
+//                                        String a[] = string.split("&");
+//                                        map1.put("list_title", a[0]);
+//                                        DataCach.boxesMap.put(key, map1);
+//                                        boxesMap2.put(key, map1);
+//                                        listItem.add(map1);
+//                                    }
+//                                }
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
