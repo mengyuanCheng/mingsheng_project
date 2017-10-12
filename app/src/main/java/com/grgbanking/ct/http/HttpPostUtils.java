@@ -62,8 +62,6 @@ public class HttpPostUtils extends AsyncTask<Object, Integer, ResultInfo> {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            resultInfo.setCode("2");
-            resultInfo.setMessage(e.getMessage());
         }
         return resultInfo;
     }

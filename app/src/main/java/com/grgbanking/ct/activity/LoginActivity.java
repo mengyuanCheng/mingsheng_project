@@ -163,6 +163,8 @@ public class LoginActivity extends Activity {
         loginButtonView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                loginNameViewValue = loginNameView.getText().toString();
+                passwordViewValue = passwordView.getText().toString();
                 String modle = getManufacturer();
                 if (FileUtil.isExist(FILE_PATH + "WDRW.dat")) {
                     //如果有
@@ -254,6 +256,7 @@ public class LoginActivity extends Activity {
      * 使用wifi连接的情况下，访问后台服务器进行登录操作
      */
     private void wifiLogin() {
+        // FIXME: 2017/10/11 账号密码错误  然后修改了账号密码 还是显示账号密码错误
         ProgressDialog waitingDialog = new ProgressDialog(LoginActivity.this);
         loginNameViewValue = loginNameView.getText().toString();
         passwordViewValue = passwordView.getText().toString();
@@ -281,121 +284,122 @@ public class LoginActivity extends Activity {
             loginUtil.setUserInfo(Constants.ISSAVEPASS, false);
         }
         //访问后台服务器进行登录操作
-        Log.d("===", Constants.URL_PDA_LOGIN);
+        Log.d(loginNameViewValue, passwordViewValue);
         new HttpPostUtils(Constants.URL_PDA_LOGIN, params, new UICallBackDao() {
             @Override
             public void callBack(ResultInfo resultInfo) {
                 Log.i(TAG, "use wifi to logining");
                 if (resultInfo.getCode() != null && !resultInfo.getCode().isEmpty()) {
+                    if (!resultInfo.getCode().equals("2")){
+                        /** 开始组装数据*/
 
-                    /** 开始组装数据*/
+                        //取出所有数据
+                        PdaLoginMessage pdaLoginMessage = resultInfo.getPdaLogMess();
+                        PdaLoginMsg pdaLoginMsg = new PdaLoginMsg();
 
-                    //取出所有数据
-                    PdaLoginMessage pdaLoginMessage = resultInfo.getPdaLogMess();
-                    PdaLoginMsg pdaLoginMsg = new PdaLoginMsg();
+                        Log.d("Message", pdaLoginMessage.getMessage());
+                        //保存到缓存
+                        pdaLoginMsg.setCode(pdaLoginMessage.getCode());
+                        pdaLoginMsg.setPdaGuardManInfo(pdaLoginMessage.getGuardManInfoList());
+                        pdaLoginMsg.setLineId(pdaLoginMessage.getLineId());
+                        pdaLoginMsg.setLineSn(pdaLoginMessage.getLineSn());
+                        pdaLoginMsg.setMsg(pdaLoginMessage.getMessage());
+                        pdaLoginMsg.setNetInfoList(pdaLoginMessage.getNetInfoList());
+                        pdaLoginMsg.setLineNotes(pdaLoginMessage.getLineNotes());
+                        pdaLoginMsg.setAllPdaBoxsMap(pdaLoginMessage.getAllPdaBoxsMap());
+                        pdaLoginMsg.setPdaUserInfo(pdaLoginMessage.getPdaLoginManInfo());
 
-                    Log.d("Message", pdaLoginMessage.getMessage());
-                    //保存到缓存
-                    pdaLoginMsg.setCode(pdaLoginMessage.getCode());
-                    pdaLoginMsg.setPdaGuardManInfo(pdaLoginMessage.getGuardManInfoList());
-                    pdaLoginMsg.setLineId(pdaLoginMessage.getLineId());
-                    pdaLoginMsg.setLineSn(pdaLoginMessage.getLineSn());
-                    pdaLoginMsg.setMsg(pdaLoginMessage.getMessage());
-                    pdaLoginMsg.setNetInfoList(pdaLoginMessage.getNetInfoList());
-                    pdaLoginMsg.setLineNotes(pdaLoginMessage.getLineNotes());
-                    pdaLoginMsg.setAllPdaBoxsMap(pdaLoginMessage.getAllPdaBoxsMap());
-                    pdaLoginMsg.setPdaUserInfo(pdaLoginMessage.getPdaLoginManInfo());
+                        DataCach.setPdaLoginMsg(pdaLoginMsg);
+                        Map<String, String> allPdaBoxsMap = pdaLoginMsg.getAllPdaBoxsMap();
+                        DataCach.netType = CODE_GUARDMANIINFO;
 
-                    DataCach.setPdaLoginMsg(pdaLoginMsg);
-                    Map<String, String> allPdaBoxsMap = pdaLoginMsg.getAllPdaBoxsMap();
-                    DataCach.netType = CODE_GUARDMANIINFO;
-
-                    //取出押运人员数据
-                    List<PdaGuardManInfo> guardManInfoList = pdaLoginMsg.getPdaGuardManInfo();
-                    if (guardManInfoList != null && guardManInfoList.size() > 0) {
-                        for (PdaGuardManInfo info : guardManInfoList) {
-                            ConvoyManInfo manInfo = new ConvoyManInfo();
-                            manInfo.setGuardManId(info.getGuardManId());
-                            manInfo.setGuardManName(info.getGuardManName());
-                            manInfo.setGuardManRFID(info.getGuardManRFID());
-                            convoyManInfo.add(manInfo);
-                        }
-                        //存入数据库
-                        DBManager dbmanager = new DBManager(context);
-                        try {
-                            dbmanager.delete();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        dbmanager.addConvoyMan(convoyManInfo);
-                    }
-
-                    //取出网点信息
-                    List<PdaNetInfo> netInfoList = pdaLoginMsg.getNetInfoList();
-                    if (netInfoList != null && netInfoList.size() > 0) {
-                        for (PdaNetInfo info : netInfoList) {
-                            NetInfo netInfo = new NetInfo();
-                            Extract extract = new Extract();
-                            ExtractBoxs extractBoxs = new ExtractBoxs();
-                            /**判断是出库还是入库决定存入哪张表*/
-                            if (info.getFlag().equals("1")) {
-                                extract.setLineSn(pdaLoginMsg.getLineSn());
-                                extract.setBankId(info.getBankId());
-                                extract.setNetTaskStatus(info.getNetTaskStatus());
-                                extract.setBankName(info.getBankName());
-                                extract.setLineId(pdaLoginMsg.getLineId());
-                                extract.setCashBoxInfoList(info.getCashBoxInfoList());
-                                extract.setNetPersonInfoList(info.getNetPersonInfoList());
-                                DBManager extractdb = new DBManager(context);
-                                extractdb.addExtract(extract);
-                            } else if (info.getFlag().equals("0")) {
-                                netInfo.setLineSn(pdaLoginMsg.getLineSn());
-                                netInfo.setBankId(info.getBankId());
-                                netInfo.setNetTaskStatus(info.getNetTaskStatus());
-                                netInfo.setBankName(info.getBankName());
-                                netInfo.setLineId(pdaLoginMsg.getLineId());
-                                netInfo.setNetPersonInfoList(info.getNetPersonInfoList());
-                                netInfo.setCashBoxInfoList(info.getCashBoxInfoList());
-                                netInfo.setFlag(info.getFlag());
-                                netInfos.add(netInfo);
+                        //取出押运人员数据
+                        List<PdaGuardManInfo> guardManInfoList = pdaLoginMsg.getPdaGuardManInfo();
+                        if (guardManInfoList != null && guardManInfoList.size() > 0) {
+                            for (PdaGuardManInfo info : guardManInfoList) {
+                                ConvoyManInfo manInfo = new ConvoyManInfo();
+                                manInfo.setGuardManId(info.getGuardManId());
+                                manInfo.setGuardManName(info.getGuardManName());
+                                manInfo.setGuardManRFID(info.getGuardManRFID());
+                                convoyManInfo.add(manInfo);
                             }
+                            //存入数据库
+                            DBManager dbmanager = new DBManager(context);
+                            try {
+                                dbmanager.delete();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            dbmanager.addConvoyMan(convoyManInfo);
                         }
-                        //存入数据库
-                        DBManager manager = new DBManager(context);
-                        manager.addNetInfo(netInfos);
-                    }
 
-                    //保存登录人员
-                    List<PdaUserInfo> pdaUserInfo = pdaLoginMsg.getPdaUserInfo();
-                    if (pdaUserInfo != null && pdaUserInfo.size() > 0) {
-                        for (PdaUserInfo info : pdaUserInfo) {
-                            info.getFlag();
-                            info.getLine();
-                            info.getLogin_name();
-                            info.getLoginId();
-                            info.getLine();
-                            pdaUserInfos.add(info);
+                        //取出网点信息
+                        List<PdaNetInfo> netInfoList = pdaLoginMsg.getNetInfoList();
+                        if (netInfoList != null && netInfoList.size() > 0) {
+                            for (PdaNetInfo info : netInfoList) {
+                                NetInfo netInfo = new NetInfo();
+                                Extract extract = new Extract();
+                                ExtractBoxs extractBoxs = new ExtractBoxs();
+                                /**判断是出库还是入库决定存入哪张表*/
+                                if (info.getFlag().equals("1")) {
+                                    extract.setLineSn(pdaLoginMsg.getLineSn());
+                                    extract.setBankId(info.getBankId());
+                                    extract.setNetTaskStatus(info.getNetTaskStatus());
+                                    extract.setBankName(info.getBankName());
+                                    extract.setLineId(pdaLoginMsg.getLineId());
+                                    extract.setCashBoxInfoList(info.getCashBoxInfoList());
+                                    extract.setNetPersonInfoList(info.getNetPersonInfoList());
+                                    DBManager extractdb = new DBManager(context);
+                                    extractdb.addExtract(extract);
+                                } else if (info.getFlag().equals("0")) {
+                                    netInfo.setLineSn(pdaLoginMsg.getLineSn());
+                                    netInfo.setBankId(info.getBankId());
+                                    netInfo.setNetTaskStatus(info.getNetTaskStatus());
+                                    netInfo.setBankName(info.getBankName());
+                                    netInfo.setLineId(pdaLoginMsg.getLineId());
+                                    netInfo.setNetPersonInfoList(info.getNetPersonInfoList());
+                                    netInfo.setCashBoxInfoList(info.getCashBoxInfoList());
+                                    netInfo.setFlag(info.getFlag());
+                                    netInfos.add(netInfo);
+                                }
+                            }
+                            //存入数据库
+                            DBManager manager = new DBManager(context);
+                            manager.addNetInfo(netInfos);
                         }
-                        //存入数据库
-                        DBManager loginDb = new DBManager(context);
-                        loginDb.addLoginMan(pdaUserInfos);
-                    }
 
-                    //保存pda款箱
-                    List<PdaCashboxInfo> pdaCashboxInfoList = pdaLoginMsg.getPdaCashboxInfo();
-                    if (pdaCashboxInfoList != null && pdaCashboxInfoList.size() > 0) {
-                        for (PdaCashboxInfo info : pdaCashboxInfoList) {
-                            CashBox cashBox = new CashBox();
-                            cashBox.setBankId(info.getBankId());
-                            cashBox.setBoxSn(info.getBoxSn());
-                            cashBox.setRfidNum(info.getRfidNum());
-                            cashBoxes.add(cashBox);
+                        //保存登录人员
+                        List<PdaUserInfo> pdaUserInfo = pdaLoginMsg.getPdaUserInfo();
+                        if (pdaUserInfo != null && pdaUserInfo.size() > 0) {
+                            for (PdaUserInfo info : pdaUserInfo) {
+                                info.getFlag();
+                                info.getLine();
+                                info.getLogin_name();
+                                info.getLoginId();
+                                info.getLine();
+                                pdaUserInfos.add(info);
+                            }
+                            //存入数据库
+                            DBManager loginDb = new DBManager(context);
+                            loginDb.addLoginMan(pdaUserInfos);
                         }
-                        //存入数据库
-                        DBManager cashBoxDB = new DBManager(context);
-                        cashBoxDB.addCashBox(cashBoxes);
-                    }
 
+                        //保存pda款箱
+                        List<PdaCashboxInfo> pdaCashboxInfoList = pdaLoginMsg.getPdaCashboxInfo();
+                        if (pdaCashboxInfoList != null && pdaCashboxInfoList.size() > 0) {
+                            for (PdaCashboxInfo info : pdaCashboxInfoList) {
+                                CashBox cashBox = new CashBox();
+                                cashBox.setBankId(info.getBankId());
+                                cashBox.setBoxSn(info.getBoxSn());
+                                cashBox.setRfidNum(info.getRfidNum());
+                                cashBoxes.add(cashBox);
+                            }
+                            //存入数据库
+                            DBManager cashBoxDB = new DBManager(context);
+                            cashBoxDB.addCashBox(cashBoxes);
+                        }
+
+                    }
 
                     //押运人员
                     if (ResultInfo.CODE_GUARDMANIINFO.equals(resultInfo.getCode())) {
@@ -411,11 +415,9 @@ public class LoginActivity extends Activity {
                         intent.setClass(LoginActivity.this, PeixiangActivity.class);
                         startActivity(intent);
                         finish();
-                    }
-                    //帐号密码错误
-                    else {
-                        Toast.makeText(context, resultInfo.getMessage(), Toast.LENGTH_SHORT).show();
-                        loginButtonView.setText("登录");
+                    }else {//如果账号密码错误
+                            Toast.makeText(context, resultInfo.getMessage(), Toast.LENGTH_SHORT).show();
+                            loginButtonView.setText("登录");
                     }
                 } else {
                     Toast.makeText(context, resultInfo.getMessage(), Toast.LENGTH_SHORT).show();
@@ -618,7 +620,6 @@ public class LoginActivity extends Activity {
             com.hlct.framework.pda.common.entity.ResultInfo
                     resultInfo = new com.hlct.framework.pda.common.entity.ResultInfo();
             if (getManufacturer().equals("alps")) {
-                resultInfo = resultInfo;
             } else {
                 try {
                     resultInfo = (com.hlct.framework.pda.common.entity.ResultInfo)

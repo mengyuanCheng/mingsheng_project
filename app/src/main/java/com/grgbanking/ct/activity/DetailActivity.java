@@ -33,7 +33,9 @@ import com.grgbanking.ct.rfid.UfhData;
 import com.grgbanking.ct.rfid.UfhData.UhfGetData;
 import com.grgbanking.ct.scan.Recordnet;
 import com.grgbanking.ct.scan.Waternet;
+import com.grgbanking.ct.utils.AudioManagerUtil;
 import com.grgbanking.ct.utils.FileUtil;
+import com.handheld.UHF.UhfManager;
 import com.hlct.framework.business.message.entity.PdaCashboxInfo;
 import com.hlct.framework.business.message.entity.PdaGuardManInfo;
 import com.hlct.framework.business.message.entity.PdaLoginMessage;
@@ -52,6 +54,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.pda.serialport.Tools;
+
 import static com.grgbanking.ct.R.id.detail_btn_commit_n;
 import static com.grgbanking.ct.activity.Constants.FILE_FORMAT;
 import static com.grgbanking.ct.activity.Constants.FILE_NAME_IN;
@@ -60,9 +64,12 @@ import static com.grgbanking.ct.activity.Constants.FILE_PATH;
 import static com.grgbanking.ct.activity.Constants.NET_COMMIT_TYPE_IN;
 import static com.grgbanking.ct.activity.Constants.NET_COMMIT_TYPE_OUT;
 import static com.grgbanking.ct.cach.DataCach.pdaLoginMsg;
+import static com.grgbanking.ct.utils.LoginUtil.getManufacturer;
 
 @SuppressLint("NewApi")
 public class DetailActivity extends Activity {
+
+    private static final String TAG = "DetailActivity";
     //Dao对象的管理者
     private static final int SCAN_INTERVAL = 10;
     private static final int MSG_UPDATE_LISTVIEW = 0;
@@ -94,80 +101,15 @@ public class DetailActivity extends Activity {
     private boolean Scanflag = false;
     private boolean isCanceled = true;
     private Handler mHandler;
-    private Map<String, Integer> data;
+    private Map<String, Integer> data = new HashMap<>();
     private ProgressDialog pd = null;
-    OnClickListener click = new OnClickListener() {
-        @Override
-        public void onClick(View arg0) {
-            String context = startDeviceButton.getText().toString();
-            switch (arg0.getId()) {
-                case R.id.detail_btn_back:
-                    if (context.equals("停止扫描")) {
-                        Toast.makeText(DetailActivity.this, "请先停止扫描", Toast.LENGTH_LONG).show();
-                    } else {
-                    }
-                    break;
-                case detail_btn_commit_n:
-                    if (context.equals("停止扫描")) {
-                        Toast.makeText(DetailActivity.this, "请先停止扫描", Toast.LENGTH_LONG).show();
-                    } else {
-                        //判断人员是否扫描完成
-                        String flag = personIsScan();
-                        if (flag.equals("true")) {
 
-                        } else {
-                            showInfoDialog(flag);
-                            break;
-                        }
-                        //判断款箱是否扫描正确
-                        flag = boxIsScan();
-                        if (flag.equals("true")) {
-
-                        } else {
-                            showInfoDialog(flag);
-                            break;
-                        }
-                        //写入文件
-                        writeFile();
-                        //判断文件是否成功生成
-                        flag = fileIsWrite();
-                        if (flag.equals("true")) {
-                            showInfoDialog("交接成功!");
-                        } else {
-                            showInfoDialog(flag);
-                        }
-                    }
-                    break;
-                case R.id.Button01:
-                    if (context.equals("启动扫描")) {
-                        connDevices();
-                        startDevices();
-                    } else {
-                        cancelScan();
-                    }
-
-
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
-    private void showWaitDialog(String msg) {
-        if (pd == null) {
-            pd = new ProgressDialog(this);
-        }
-        pd.setCancelable(false);
-        pd.setMessage(msg);
-        pd.show();
-    }
-
-    private void hideWaitDialog() {
-        if (pd != null) {
-            pd.cancel();
-        }
-    }
+    /****************掃描方式二*********************/
+    private UhfManager uhfManager;
+    private int power = 0;//rate of work
+    private int area = 0;
+    private boolean runFlag = true;      //判断是否正在进行RFID扫描
+    private boolean startFlag = false;   //判断btnStart的状态
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,19 +160,134 @@ public class DetailActivity extends Activity {
         //		findViewById(R.id.add_photo).setOnClickListener(click);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (getManufacturer().equals("alps")) {
+            uhfManager = UhfManager.getInstance();
+            if (uhfManager == null) {
+                Log.e("uhfmanager ---->", "打开失败");
+                return;
+            } else {
+                Log.e("uhfmanager ---->", "打开成功");
+            }
+            uhfManager.setOutputPower(power);
+            uhfManager.setWorkArea(area);
+
+            ScanThread scanThread = new ScanThread();
+            scanThread.start();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (getManufacturer().equals("alps")) {
+            if (uhfManager != null) {
+                uhfManager.close();
+                uhfManager = null;
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (getManufacturer().equals("alps")) {
+            if (uhfManager != null) {
+                uhfManager.close();
+                uhfManager = null;
+            }
+        }
+    }
+
+    OnClickListener click = new OnClickListener() {
+        @Override
+        public void onClick(View arg0) {
+            String context = startDeviceButton.getText().toString();
+            switch (arg0.getId()) {
+                case R.id.detail_btn_back:
+                    if (context.equals("停止扫描")) {
+                        Toast.makeText(DetailActivity.this, "请先停止扫描", Toast.LENGTH_LONG).show();
+                    } else {
+                    }
+                    break;
+                case detail_btn_commit_n:
+                    if (context.equals("停止扫描")) {
+                        Toast.makeText(DetailActivity.this, "请先停止扫描", Toast.LENGTH_LONG).show();
+                    } else {
+                        //判断人员是否扫描完成
+                        String flag = personIsScan();
+                        if (flag.equals("true")) {
+
+                        } else {
+                            showInfoDialog(flag);
+                            break;
+                        }
+                        //判断款箱是否扫描正确
+                        flag = boxIsScan();
+                        if (flag.equals("true")) {
+
+                        } else {
+                            showInfoDialog(flag);
+                            break;
+                        }
+                        //写入文件
+                        writeFile();
+                        //判断文件是否成功生成
+                        flag = fileIsWrite();
+                        if (flag.equals("true")) {
+                            showInfoDialog("交接成功!");
+                        } else {
+                            showInfoDialog(flag);
+                        }
+                    }
+                    break;
+                case R.id.Button01:
+                    // TODO: 2017/10/11
+                    if (getManufacturer().equals("alps")) {
+                        if (context.equals("启动扫描")) {
+                            startFlag = true;
+                            startDeviceButton.setText("停止扫描");
+                        } else {
+                            startFlag = false;
+                            startDeviceButton.setText("启动扫描");
+                        }
+                    } else {
+                        if (context.equals("启动扫描")) {
+                            connDevices();
+                            startDevices();
+                        } else {
+                            cancelScan();
+                        }
+                    }
+
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     private void flashInfo() {
         mHandler = new Handler() {
 
             @Override
             public void handleMessage(Message msg) {
-                if (isCanceled)
-                    return;
+//                if (isCanceled)
+//                    return;
                 switch (msg.what) {
                     case MSG_UPDATE_LISTVIEW:
 
-                        //data中存放Pda扫描上来的数据
-                        data = UfhData.scanResult6c;
+                        if (getManufacturer().equals("alps")) {
+                            String epc = msg.getData().getString("rfid");
+                            Log.d(TAG, "handleMessage: " + epc);
+                            data.put(epc,0);
+                        }else{
+                            //data中存放Pda扫描上来的数据
+                            data = UfhData.scanResult6c;
+                        }
+
                         String person1 = person1TextView.getText().toString();
                         String person2 = person2TextView.getText().toString();
                         String person3 = person3TextView.getText().toString();
@@ -287,12 +344,12 @@ public class DetailActivity extends Activity {
                                     HashMap<String, Object> map = DataCach.taskMap.get(count + "");
                                     PdaNetInfo pni = (PdaNetInfo) map.get("data");
                                     List<PdaNetPersonInfo> netPersonInfoList = pni.getNetPersonInfoList();
-                                    Log.d("===netPersonInfoList",netPersonInfo+"");
+                                    Log.d("===netPersonInfoList", netPersonInfo + "");
                                     if (person2.trim().equals("")) {
                                         if (pni != null) {
                                             if (netPersonInfoList != null && netPersonInfoList.size() > 0) {
-                                                Log.d("===netPersonInfoList",netPersonInfo+"");
-                                                Log.d("===网点人员",key);
+                                                Log.d("===netPersonInfoList", netPersonInfo + "");
+                                                Log.d("===网点人员", key);
                                                 for (PdaNetPersonInfo info : netPersonInfoList) {
                                                     if (info.getNetPersonRFID().equals(key)) {
                                                         person2TextView.setText(info.getNetPersonName());
@@ -499,12 +556,6 @@ public class DetailActivity extends Activity {
 
         listItemAdapter.notifyDataSetChanged();
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
 
     private void showInfoDialog(String msg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(DetailActivity.this);
@@ -827,7 +878,6 @@ public class DetailActivity extends Activity {
         return msg;
     }
 
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -842,5 +892,60 @@ public class DetailActivity extends Activity {
             }
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void showWaitDialog(String msg) {
+        if (pd == null) {
+            pd = new ProgressDialog(this);
+        }
+        pd.setCancelable(false);
+        pd.setMessage(msg);
+        pd.show();
+    }
+
+    private void hideWaitDialog() {
+        if (pd != null) {
+            pd.cancel();
+        }
+    }
+
+    /**
+     * 子线程处理扫描结果
+     */
+    private class ScanThread extends Thread {
+        private List<byte[]> epcList;
+
+        @Override
+        public void run() {
+            super.run();
+            while (runFlag) {
+                if (startFlag) {
+                    // manager.stopInventoryMulti()
+                    epcList = uhfManager.inventoryRealTime(); // inventory real time
+                    if (epcList != null && !epcList.isEmpty()) {
+                        // play sound
+                        new AudioManagerUtil(context).playDiOnce();
+                        for (byte[] epc : epcList) {
+                            String epcStr = Tools.Bytes2HexString(epc,
+                                    epc.length);
+                            Log.d(TAG, "run: " + epcStr);
+                            Message message = Message.obtain();
+                            message.what = MSG_UPDATE_LISTVIEW;
+                            Bundle bundle = new Bundle();
+                            bundle.putString("rfid",epcStr);
+                            message.setData(bundle);
+                            mHandler.sendMessage(message);
+                        }
+                    }
+                    epcList = null;
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        }
     }
 }
