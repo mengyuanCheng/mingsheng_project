@@ -225,6 +225,7 @@ public class MainActivity extends Activity {
                 }).execute();
             }
         });
+
         builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
