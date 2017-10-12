@@ -35,10 +35,16 @@ import com.grgbanking.ct.database.Person;
 import com.grgbanking.ct.database.PersonTableHelper;
 import com.grgbanking.ct.entity.PdaLoginMsg;
 import com.grgbanking.ct.entity.TaskInfo;
+import com.grgbanking.ct.http.HttpPostUtils;
+import com.grgbanking.ct.http.ResultInfo;
+import com.grgbanking.ct.http.UICallBackDao;
 import com.grgbanking.ct.utils.FileUtil;
 import com.hlct.framework.business.message.entity.PdaCashboxInfo;
 import com.hlct.framework.business.message.entity.PdaNetInfo;
 import com.hlct.framework.business.message.entity.PdaNetPersonInfo;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,6 +52,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.grgbanking.ct.activity.Constants.FILE_FORMAT;
+import static com.grgbanking.ct.activity.Constants.FILE_NAME_IN;
+import static com.grgbanking.ct.activity.Constants.FILE_NAME_OUT;
+import static com.grgbanking.ct.activity.Constants.FILE_PATH;
 import static com.grgbanking.ct.cach.DataCach.netType;
 import static com.grgbanking.ct.utils.FileUtil.ConversionDate;
 
@@ -195,7 +205,27 @@ public class MainActivity extends Activity {
         //    设置Content来显示一个信息
         builder.setMessage(msg);
         //    设置一个NeutralButton
-        builder.setNeutralButton("确认", new DialogInterface.OnClickListener() {
+        builder.setNeutralButton("上传", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                List<NameValuePair> params = new ArrayList<>();
+                String date = FileUtil.getDate();
+                String mResult="";
+                if (mainTitle.getText().toString().equals("网点入库任务列表")){
+                    mResult =FileUtil.readTXT(FILE_PATH + FILE_NAME_IN + date + FILE_FORMAT);
+                }else if (mainTitle.getText().toString().equals("网点出库任务列表")){
+                    mResult =FileUtil.readTXT(FILE_PATH + FILE_NAME_OUT + date + FILE_FORMAT);
+                }
+                params.add(new BasicNameValuePair("content", mResult));
+                new HttpPostUtils(Constants.URL_PDA_UPLOAD, params, new UICallBackDao() {
+                    @Override
+                    public void callBack(ResultInfo resultInfo) {
+                        Toast.makeText(getApplicationContext(),resultInfo.getMessage(),Toast.LENGTH_LONG).show();
+                    }
+                }).execute();
+            }
+        });
+        builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 

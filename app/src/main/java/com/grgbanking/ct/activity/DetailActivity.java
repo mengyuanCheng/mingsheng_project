@@ -338,6 +338,7 @@ public class DetailActivity extends Activity {
                                 }
                                 //判断是否是网点人员
                                 else if (key.indexOf(Constants.PRE_RFID_BANKEMPLOYEE) != -1) {
+                                    Log.d("网店人员",key);
                                     Intent intent = getIntent();
                                     Bundle bundle = intent.getBundleExtra("bundle");
                                     int count = bundle.getInt("count");

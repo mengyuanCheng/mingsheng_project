@@ -23,6 +23,10 @@ public class Constants {
      * PDA登录地址
      */
     public static final String URL_PDA_LOGIN = BASE_SERVER_URL + "/mobile-message!pdaLogin.do";
+    /**
+     * 出入庫文件提交地址
+     */
+    public static final String URL_PDA_UPLOAD = BASE_SERVER_URL+"/mobile-message!UpdateNet.do";
 
     /**
      * 获取网点出、入库信息地址
