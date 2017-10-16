@@ -860,7 +860,6 @@ public class DBManager {
         } catch (Exception e) {
             Log.e("DBManager", "" + e);
         }
-
         //        db.endTransaction();//结束事物
     }
 }
