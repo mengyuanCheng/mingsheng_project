@@ -3,11 +3,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 android {
     compileSdkVersion 19
-    buildToolsVersion "25.0.3"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "com.grgbanking.ct"
-        minSdkVersion 14
+        minSdkVersion 17
         targetSdkVersion 19
     }
 
@@ -41,4 +41,6 @@ dependencies {
     compile 'org.greenrobot:greendao:3.2.0'
     compile files('libs/SerialPort.jar')
     compile files('libs/uhf_1_v1.0.jar')
+    compile files('libs/scanAidl.jar')
+    compile 'com.squareup.okhttp3:okhttp:3.9.0'
 }

@@ -13,14 +13,24 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.grgbanking.ct.R;
+import com.grgbanking.ct.http.HttpPostUtils;
+import com.grgbanking.ct.http.ResultInfo;
+import com.grgbanking.ct.http.UICallBackDao;
 import com.grgbanking.ct.qcode.ScanActivity;
 import com.grgbanking.ct.utils.FileUtil;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.grgbanking.ct.qcode.ScanActivity.REQUEST_CODE_SCAN;
+import static com.grgbanking.ct.utils.LoginUtil.getManufacturer;
+import static com.grgbanking.ct.utils.LoginUtil.isNetworkConnected;
 
 public class SaveQRCodeActivity extends Activity implements View.OnClickListener{
     private Context mContext;
@@ -120,6 +130,26 @@ public class SaveQRCodeActivity extends Activity implements View.OnClickListener
                             .setTitle("提示信息")
                             .setMessage("保存数据成功！")
                             .setPositiveButton("确认", null)
+                            .setNegativeButton("上传", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if(getManufacturer().equals("alps") && isNetworkConnected(mContext)){
+                                        //TODO 上传生成的文件
+                                        List<NameValuePair> params = new ArrayList<>();
+                                        String date = FileUtil.getDate();
+                                        String mResult=FileUtil.readTXT(FILE_PATH + FILE_NAME + date + FILE_FORMAT);
+                                        params.add(new BasicNameValuePair("content", mResult));
+                                        new HttpPostUtils(Constants.URL_QRCODE_NET_UPLOAD, params, new UICallBackDao() {
+                                            @Override
+                                            public void callBack(ResultInfo resultInfo) {
+                                                Toast.makeText(getApplicationContext(),resultInfo.getMessage(),Toast.LENGTH_SHORT).show();
+                                            }
+                                        }).execute();
+                                    }else{
+                                        Toast.makeText(getApplicationContext(),"没有网络",Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            })
                             .show();
                 }
 

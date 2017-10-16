@@ -16,12 +16,13 @@
 
     <TextView
         android:id="@+id/array_listview_textview"
-        android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:gravity="center_vertical"
         android:hint="rfid code "
         android:padding="8dp"
+        android:textColor="?android:attr/textColorPrimaryInverse"
         android:textSize="20sp"/>
     <TextView
         android:id="@+id/array_listview_scan_num"
@@ -29,5 +30,6 @@
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:textSize="20sp"
+        android:textColor="?android:attr/textColorPrimaryInverse"
         />
 </LinearLayout>

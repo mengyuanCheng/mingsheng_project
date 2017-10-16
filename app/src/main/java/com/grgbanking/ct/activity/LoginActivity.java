@@ -272,7 +272,7 @@ public class LoginActivity extends Activity {
 
         loginButtonView.setText("正在登录中...");
         loginButtonView.setEnabled(false);
-
+        params.clear();
         params.add(new BasicNameValuePair("login_name", loginNameViewValue));
         params.add(new BasicNameValuePair("login_password", passwordViewValue));
 
@@ -420,7 +420,7 @@ public class LoginActivity extends Activity {
                             loginButtonView.setText("登录");
                     }
                 } else {
-                    Toast.makeText(context, resultInfo.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "网络错误", Toast.LENGTH_SHORT).show();
                     loginButtonView.setText("登录");
                 }
                 loginButtonView.setEnabled(true);

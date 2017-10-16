@@ -2,13 +2,17 @@ package com.grgbanking.ct.qcode;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.device.ScanManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -23,10 +27,15 @@ import android.widget.Toast;
 
 import com.grgbanking.ct.R;
 import com.grgbanking.ct.activity.MApplication;
+import com.grgbanking.ct.utils.AudioManagerUtil;
+import com.pda.scan.DecoderConfigValues.SymbologyID;
+import com.pda.scan.IHWScan;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 import static com.grgbanking.ct.cach.DataCach.barcodeList;
+import static com.grgbanking.ct.utils.LoginUtil.getManufacturer;
 
 /**
  * @author ：     cmy
@@ -36,6 +45,7 @@ import static com.grgbanking.ct.cach.DataCach.barcodeList;
  */
 
 public class ScanActivity extends Activity {
+    private static final String TAG = "ScanActivity";
     private final static String SCAN_ACTION = "android.intent.ACTION_DECODE_DATA";
     public static final int REQUEST_CODE_SCAN = 222;   //请求码
     public static final int RESULT_CODE_SCAN = 333;    //返回码
@@ -65,17 +75,26 @@ public class ScanActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            isScaning = false;
-            soundpool.play(soundid, 1, 1, 0, 0, 1);
-            showScanResult.setText("");
-            mVibrator.vibrate(100);
-            byte[] barcode = intent.getByteArrayExtra("barcode");
-            int barocodelen = intent.getIntExtra("length", 0);
-            byte temp = intent.getByteExtra("barcodeType", (byte) 0);
-            Log.i("debug", "----codetype--" + temp);
-            barcodeStr = new String(barcode, 0, barocodelen);
-
-            String barcodeStr = intent.getStringExtra("barcode_string");//直接获取字符串
+            String barcodeStr = "";
+            if (getManufacturer().equals("alps")) {
+                new AudioManagerUtil(context).playDiOnce();
+                mVibrator.vibrate(100);
+                barcodeStr = intent.getStringExtra("barcode");
+                if (barcodeStr != null) {
+                    Log.e(TAG, "onReceive1: " + barcodeStr);
+                }
+            } else {
+                isScaning = false;
+                soundpool.play(soundid, 1, 1, 0, 0, 1);
+                showScanResult.setText("");
+                mVibrator.vibrate(100);
+                /*byte[] barcode = intent.getByteArrayExtra("barcode");
+                int barocodelen = intent.getIntExtra("length", 0);
+                byte temp = intent.getByteExtra("barcodeType", (byte) 0);
+                Log.i("debug", "----codetype--" + temp);
+                barcodeStr = new String(barcode, 0, barocodelen);*/
+                barcodeStr = intent.getStringExtra("barcode_string");//直接获取字符串
+            }
             showScanResult.setText(barcodeStr);
             if (mArrayList.contains(barcodeStr) || barcodeList.contains(barcodeStr)) {
                 Toast.makeText(ScanActivity.this, "扫描结果已经存在", Toast.LENGTH_SHORT).show();
@@ -88,10 +107,33 @@ public class ScanActivity extends Activity {
                     mArrayAdapter.notifyDataSetChanged();
                 }
             }
-
         }
     };
+
     private Toast toast = null;
+
+    /*--------------------------------------------*/
+    private IHWScan iScan;
+    private boolean mrunning = false;
+    private boolean connFlag = false;
+    private boolean isRecved = false;
+    private Timer scanTimer;
+
+    private BroadcastReceiver keyReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.e("Action ------->", "keyReceiver Method running");
+            int keyCode = intent.getIntExtra("keyCode", 0);
+            boolean keyDown = intent.getBooleanExtra("keydown", false);
+            //F1 F2 F3 F4 F5
+            if (keyDown && (keyCode == KeyEvent.KEYCODE_F1 || keyCode == KeyEvent.KEYCODE_F2 || keyCode == KeyEvent.KEYCODE_F3 ||
+                    keyCode == KeyEvent.KEYCODE_F4 || keyCode == KeyEvent.KEYCODE_F5 || keyCode == KeyEvent.KEYCODE_F6)) {
+                mrunning = true;
+            }
+        }
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +146,88 @@ public class ScanActivity extends Activity {
         context = ScanActivity.this;
         setupView();
         getInfo();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (getManufacturer().equals("alps")) {
+            unregisterReceiver(keyReceiver);
+            //TODO
+            unregisterReceiver(mScanReceiver);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            if (connFlag) {
+                connFlag = false;
+                try {
+                    Log.e(TAG, "close----");
+                    iScan.close();
+                } catch (RemoteException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                Log.e("Action ------->", "onPause Method running");
+                unbindService(conn);
+            }
+        } else {
+            if (mScanManager != null) {
+                mScanManager.stopDecode();
+                isScaning = false;
+            }
+            unregisterReceiver(mScanReceiver);
+
+            //传递数据
+            Intent intent = new Intent();
+            intent.setAction("action.refreshQCode");
+            intent.putExtra("rfidNum", rfidNum);
+            intent.putStringArrayListExtra("QRcodelist", QRcodelist);
+            Log.d("onPause: ", "" + QRcodelist);
+            ScanActivity.this.sendBroadcast(intent);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getManufacturer().equals("alps")) {
+            Log.e(TAG, "onResume: running");
+            //bind service
+            bindScanService();
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("com.scan.RESULT");
+            //TODO
+            registerReceiver(mScanReceiver, filter);
+            //key receiver
+            IntentFilter keyfilter = new IntentFilter();
+            keyfilter.addAction("android.rfid.FUN_KEY");
+            registerReceiver(keyReceiver, keyfilter);
+        } else {
+            initScan();
+            showScanResult.setText("");
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(SCAN_ACTION);
+            registerReceiver(mScanReceiver, filter);
+        }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return super.onKeyDown(keyCode, event);
     }
 
     private void initScan() {
@@ -143,15 +267,20 @@ public class ScanActivity extends Activity {
         mScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                mScanManager.stopDecode();
-                isScaning = true;
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if (getManufacturer().equals("alps")) {
+                    Log.e(TAG, "onClick: Scan");
+                    mrunning = true;
+                    new Thread(mScanThread).start();
+                } else {
+                    mScanManager.stopDecode();
+                    isScaning = true;
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mScanManager.startDecode();
                 }
-                mScanManager.startDecode();
             }
         });
 
@@ -159,8 +288,16 @@ public class ScanActivity extends Activity {
         mClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                if (getManufacturer().equals("alps")) {
+                    //TODO
+                    mrunning = false;
+                    /*if (scanTimer != null) {
+                        scanTimer.cancel();
+                    }*/
+                } else {
+                    mScanManager.stopDecode();
+                }
                 saveData();
-                mScanManager.stopDecode();
             }
         });
 
@@ -184,49 +321,6 @@ public class ScanActivity extends Activity {
         finish();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mScanManager != null) {
-            mScanManager.stopDecode();
-            isScaning = false;
-        }
-        unregisterReceiver(mScanReceiver);
-
-        //传递数据
-        Intent intent = new Intent();
-        intent.setAction("action.refreshQCode");
-        intent.putExtra("rfidNum", rfidNum);
-        intent.putStringArrayListExtra("QRcodelist", QRcodelist);
-        Log.d("onPause: ", "" + QRcodelist);
-        ScanActivity.this.sendBroadcast(intent);
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initScan();
-        showScanResult.setText("");
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(SCAN_ACTION);
-        registerReceiver(mScanReceiver, filter);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return super.onKeyDown(keyCode, event);
-    }
 
     /**
      * 获取qcode传过来的rfidNum
@@ -251,4 +345,86 @@ public class ScanActivity extends Activity {
         }
         toast.show();
     }
+
+    //bind service
+    private void bindScanService() {
+        Intent intent = new Intent();
+        intent.setAction("com.scan.service");//SCAN ACTION
+        bindService(intent, conn, Context.BIND_AUTO_CREATE);
+    }
+
+
+    private int modeBroad = 0;
+    //service connect
+    private ServiceConnection conn = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName component) {
+            Log.e(TAG, "onServiceDisconnected*****");
+
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName component, IBinder ibinder) {
+            Log.e(TAG, "onServiceConnected----");
+            connFlag = true;
+            //			iScan = IScan.Stub.asInterface(ibinder);
+            iScan = IHWScan.Stub.asInterface(ibinder);
+            try {
+                iScan.init();
+                //set para
+                iScan.setInputMode(modeBroad);
+                //open barcode
+                iScan.enableSymbology(SymbologyID.SYM_QR);
+                iScan.enableSymbology(SymbologyID.SYM_CODE128);
+                iScan.enableSymbology(SymbologyID.SYM_CODE39);
+                iScan.enableSymbology(SymbologyID.SYM_DATAMATRIX);
+                iScan.enableSymbology(SymbologyID.SYM_PDF417);
+                iScan.enableSymbology(SymbologyID.SYM_MAXICODE);
+                iScan.enableSymbology(SymbologyID.SYM_HANXIN);//chinese hanxin
+                iScan.enableSymbology(SymbologyID.SYM_ALL);
+            } catch (RemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+    };
+
+
+    //scan thread
+    private Runnable mScanThread = new Runnable() {
+        @Override
+        public void run() {
+            while (mrunning) {
+                //				if(!isRecved){
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                //scan
+                scan();
+
+                //				}
+            }
+        }
+
+        ;
+    };
+    //start scan
+    private void scan() {
+        if (connFlag) {
+            try {
+                Log.e("Action ------->", "Scan Method running");
+                isRecved = true;
+                iScan.scan();
+            } catch (RemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

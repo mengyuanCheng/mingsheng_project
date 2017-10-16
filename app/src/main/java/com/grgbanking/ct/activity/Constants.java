@@ -27,6 +27,15 @@ public class Constants {
      * 出入庫文件提交地址
      */
     public static final String URL_PDA_UPLOAD = BASE_SERVER_URL+"/mobile-message!UpdateNet.do";
+    /**
+     * 网络提交peixiang数据
+     */
+    public static final String URL_PX_NET_UPLOAD = BASE_SERVER_URL + "/mobile-message!UpdatePX.do";
+
+    /**
+     * 网络提交peixiang数据
+     */
+    public static final String URL_QRCODE_NET_UPLOAD = BASE_SERVER_URL + "/mobile-message!UpdateQRCODE.do";
 
     /**
      * 获取网点出、入库信息地址
