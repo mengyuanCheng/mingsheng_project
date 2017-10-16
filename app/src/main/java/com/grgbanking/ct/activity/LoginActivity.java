@@ -245,7 +245,6 @@ public class LoginActivity extends Activity {
             Toast.makeText(context, "帐号密码有误,请重新输入", Toast.LENGTH_SHORT).show();
         }
     }
-
     /**
      * 使用wifi连接的情况下，访问后台服务器进行登录操作
      */
