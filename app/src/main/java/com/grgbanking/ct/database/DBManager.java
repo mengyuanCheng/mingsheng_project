@@ -860,7 +860,19 @@ public class DBManager {
         } catch (Exception e) {
             Log.e("DBManager", "" + e);
         }
-
         //        db.endTransaction();//结束事物
+    }
+
+    /**
+     * 清除任务信息
+     */
+    public void deleteNetTaskMsg(){
+        try {
+            db=helper.getWritableDatabase();
+            db.delete(DBHelper.TABLE_PdaNetInfo_NAME,null,null);
+            db.delete(DBHelper.TABLE_EXTRACT_NAME,null,null);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

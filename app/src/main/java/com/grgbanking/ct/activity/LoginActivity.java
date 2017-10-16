@@ -139,8 +139,6 @@ public class LoginActivity extends Activity {
         context = this.getApplicationContext();
         super.onCreate(savedInstanceState);
         //		startService(new Intent(context, GrgbankService.class));
-
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.login);
 
@@ -165,16 +163,14 @@ public class LoginActivity extends Activity {
             public void onClick(View v) {
                 loginNameViewValue = loginNameView.getText().toString();
                 passwordViewValue = passwordView.getText().toString();
-                String modle = getManufacturer();
-                if (FileUtil.isExist(FILE_PATH + "WDRW.dat")) {
-                    //如果有
-                    fileName = "WDRW.dat";
-                    mAsyncTask mAsyncTask = new mAsyncTask();
-                    mAsyncTask.execute();
-                } else {
+                DBManager dbManager = new DBManager(getApplicationContext());
+                dbManager.deleteNetTaskMsg();
+                if (getManufacturer().equals("alps")){//汉德霍尔机器登录
+                    wifiLogin();
+                }else {//荣瑞机器登录
                     //判断有无文件
                     boolean isExist = FileUtil.isExist(FILE_PATH + date + "WDRW.dat");
-                    if (isExist) {
+                    if (isExist) {//有
                         fileName = date + "WDRW.dat";
                         /**
                          *  显示一个进度条,提示当前解析进度.
@@ -182,14 +178,12 @@ public class LoginActivity extends Activity {
                          */
                         mAsyncTask mAsyncTask = new mAsyncTask();
                         mAsyncTask.execute();
-                    } else if (modle.equals("alps")) {
-                        wifiLogin();
-                    } else {
+                    }else {//无
                         ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
                         showWaitingDialog(progressDialog, "提示", "未发现今日文件！", true);
                     }
-                }
 
+                }
             }
 
         });
@@ -408,8 +402,9 @@ public class LoginActivity extends Activity {
                         intent.setClass(LoginActivity.this, NetOutInActivity.class);
                         startActivity(intent);
                         finish();
-                        //配箱人员
-                    } else if (ResultInfo.CODE_PEIXIANG.equals(resultInfo.getCode())) {
+                    }
+                    //配箱人员
+                    else if (ResultInfo.CODE_PEIXIANG.equals(resultInfo.getCode())) {
                         success();
                         Intent intent = new Intent();
                         intent.setClass(LoginActivity.this, PeixiangActivity.class);
@@ -420,7 +415,7 @@ public class LoginActivity extends Activity {
                             loginButtonView.setText("登录");
                     }
                 } else {
-                    Toast.makeText(context, "网络错误", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "无法获取任务信息", Toast.LENGTH_SHORT).show();
                     loginButtonView.setText("登录");
                 }
                 loginButtonView.setEnabled(true);
