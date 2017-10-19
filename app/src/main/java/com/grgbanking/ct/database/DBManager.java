@@ -858,7 +858,7 @@ public class DBManager {
             db.delete(DBHelper.TABLE_EXTRACTBOXS_NAME, null, null);
             db.close();
         } catch (Exception e) {
-            Log.e("DBManager", "" + e);
+            e.printStackTrace();
         }
         //        db.endTransaction();//结束事物
     }

@@ -168,7 +168,9 @@ public class LoginActivity extends Activity {
                 if (getManufacturer().equals("alps")){//汉德霍尔机器登录
                     wifiLogin();
                 }else {//荣瑞机器登录
-                    //判断有无文件
+                    /**
+                     * 网点登录
+                     */
                     boolean isExist = FileUtil.isExist(FILE_PATH + date + "WDRW.dat");
                     if (isExist) {//有
                         fileName = date + "WDRW.dat";
@@ -178,7 +180,14 @@ public class LoginActivity extends Activity {
                          */
                         mAsyncTask mAsyncTask = new mAsyncTask();
                         mAsyncTask.execute();
-                    }else {//无
+                    }else if (FileUtil.isExist(FILE_PATH + "WDRW.dat")){
+                        /**
+                         * 金库登录
+                         */
+                        fileName = "WDRW.dat";
+                        mAsyncTask mAsyncTask = new mAsyncTask();
+                        mAsyncTask.execute();
+                    } else {//无
                         ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
                         showWaitingDialog(progressDialog, "提示", "未发现今日文件！", true);
                     }
