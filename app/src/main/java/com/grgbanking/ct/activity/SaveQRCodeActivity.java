@@ -112,7 +112,6 @@ public class SaveQRCodeActivity extends Activity implements View.OnClickListener
                 Intent intent = new Intent(mContext, ScanActivity.class);
                 startActivityForResult(intent, REQUEST_CODE_SCAN);
                 break;
-            //TODO 保存信息,生成文件
             case R.id.save_btn_save_data:
                 if(mArrayList.isEmpty()){
                     new AlertDialog.Builder(mContext)
@@ -134,7 +133,6 @@ public class SaveQRCodeActivity extends Activity implements View.OnClickListener
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     if(getManufacturer().equals("alps") && isNetworkConnected(mContext)){
-                                        //TODO 上传生成的文件
                                         List<NameValuePair> params = new ArrayList<>();
                                         String date = FileUtil.getDate();
                                         String mResult=FileUtil.readTXT(FILE_PATH + FILE_NAME + date + FILE_FORMAT);

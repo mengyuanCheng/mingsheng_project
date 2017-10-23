@@ -258,7 +258,6 @@ public class LoginActivity extends Activity {
      * 使用wifi连接的情况下，访问后台服务器进行登录操作
      */
     private void wifiLogin() {
-        // FIXME: 2017/10/11 账号密码错误  然后修改了账号密码 还是显示账号密码错误
         ProgressDialog waitingDialog = new ProgressDialog(LoginActivity.this);
         loginNameViewValue = loginNameView.getText().toString();
         passwordViewValue = passwordView.getText().toString();
@@ -808,5 +807,4 @@ public class LoginActivity extends Activity {
         }
     }
 
-    // TODO: 2017/10/9 根据设备的不同采用不同的登陆方式,(网络登陆)
 }
