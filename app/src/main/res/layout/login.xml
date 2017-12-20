@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:id="@+id/content_layout"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:orientation="vertical">
@@ -16,7 +16,7 @@
         <EditText
             android:id="@+id/username_edit"
             style="@style/normalText"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edit_draw_bg"
             android:drawableLeft="@drawable/icon_man"
@@ -29,7 +29,7 @@
         <EditText
             android:id="@+id/password_edit"
             style="@style/normalText"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/edit_draw_bg"
@@ -39,19 +39,38 @@
             android:inputType="numberPassword"
             android:paddingLeft="10dip"
             android:singleLine="true"/>
-
-        <CheckBox
-            android:layout_marginLeft="5dp"
-            android:id="@+id/cb"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dip"
-            android:button="@drawable/checkselect_draw_bg"
-            android:checked="false"
-            android:paddingLeft="5dip"
-            android:text="@string/login_remember_password"
-            android:textColor="@color/grey">
-        </CheckBox>
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+            <CheckBox
+                android:layout_marginLeft="5dp"
+                android:id="@+id/cb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/checkselect_draw_bg"
+                android:checked="false"
+                android:paddingLeft="5dip"
+                android:text="@string/login_remember_password"
+                android:textColor="@color/grey">
+            </CheckBox>
+            <View
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"/>
+            <CheckBox
+                android:id="@+id/login_cb_if_delete_peixiang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/checkselect_draw_bg"
+                android:layout_marginEnd="5dp"
+                android:paddingLeft="5dp"
+                android:text="@string/checkBox_delete_PeiXiang"
+                android:textColor="@color/grey">
+            </CheckBox>
+        </LinearLayout>
+
 
     </LinearLayout>
 
@@ -64,6 +83,7 @@
         android:layout_below="@id/content_layout"
         android:layout_marginTop="30dp"
         android:background="@drawable/shape"
+        android:textColor="@color/white"
         android:text="@string/login_label_signin"/>
 
     <TextView

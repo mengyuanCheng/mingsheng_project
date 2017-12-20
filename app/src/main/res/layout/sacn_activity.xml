@@ -40,6 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
+        android:textColor="@color/white"
         android:background="@drawable/shape"
         android:contentDescription="保存信息"
         android:text="开始扫描"/>
@@ -50,6 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:background="@drawable/shape"
+        android:textColor="@color/white"
         android:text="关闭扫描"/>
     <!--<Button-->
     <!--android:id="@+id/manager"-->

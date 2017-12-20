@@ -444,7 +444,7 @@ public class MainActivity extends Activity {
             tkList = db.queryTaskInfo(bankId);
             for (int i = 0; i < tkList.size(); i++) {
                 FileUtil f = new FileUtil();
-                boolean b = f.areSameDay(ConversionDate(tkList.get(i).getTime()),
+                boolean b = FileUtil.areSameDay(ConversionDate(tkList.get(i).getTime()),
                         new Date(System.currentTimeMillis()));
                 if (b) {
                     flag = tkList.get(i).getNetType().equals(netType);

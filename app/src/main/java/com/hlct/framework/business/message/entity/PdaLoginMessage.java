@@ -26,6 +26,16 @@ public class PdaLoginMessage implements Serializable {
     private List<PdaNetInfo> netInfoList;
     private List<PdaGuardManInfo> guardManInfoList;
     private Map<String, String> allPdaBoxsMap;
+    private Map<String, String> bankPX;
+
+    public Map<String, String> getBankPX() {
+        return bankPX;
+    }
+
+    public void setBankPX(Map<String, String> bankPX) {
+        this.bankPX = bankPX;
+    }
+
     private String code;
     private String message;
 
@@ -54,7 +64,6 @@ public class PdaLoginMessage implements Serializable {
                 plm.setGuardManInfoList(guardManInfoList);
 
                 JSONObject allPdaBoxsObj = jsonObject.getJSONObject("allPdaBoxsMap");
-
                 Iterator iterator = allPdaBoxsObj.keys();
                 String key, value;
                 Map<String, String> allPdaBoxsMap = new HashMap<>();
@@ -67,8 +76,16 @@ public class PdaLoginMessage implements Serializable {
                 }
                 plm.setAllPdaBoxsMap(allPdaBoxsMap);
 
-                //                Map<String, String> allPdaBoxsMap = PdaCashboxInfo.JSONArraytoPdaNetInfoMap(allPdaBoxsArray);
-                //                                plm.setAllPdaBoxsMap(allPdaBoxsMap);
+                JSONObject bankPX = jsonObject.getJSONObject("bankPX");
+                Iterator iterator1 = bankPX.keys();
+                Map<String, String> bankPXMap = new HashMap<>();
+                while (iterator1.hasNext()) {
+                    String str = (String) iterator1.next();
+                    bankPXMap.put(str, bankPX.getString(str));
+                }
+                plm.setBankPX(bankPXMap);
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }

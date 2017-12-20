@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.grgbanking.ct.R;
 import com.grgbanking.ct.cach.DataCach;
 import com.grgbanking.ct.database.CashBox;
@@ -32,9 +33,13 @@ import com.grgbanking.ct.database.DBManager;
 import com.grgbanking.ct.database.Extract;
 import com.grgbanking.ct.database.ExtractBoxs;
 import com.grgbanking.ct.database.NetInfo;
+import com.grgbanking.ct.entity.BankPX;
 import com.grgbanking.ct.entity.ConvoyManInfo;
 import com.grgbanking.ct.entity.LoginUser;
 import com.grgbanking.ct.entity.PdaLoginMsg;
+import com.grgbanking.ct.greendao.BankPXDao;
+import com.grgbanking.ct.greendao.BankTaskQRDao;
+import com.grgbanking.ct.greendao.GreenDaoManager;
 import com.grgbanking.ct.http.HttpPostUtils;
 import com.grgbanking.ct.http.ResultInfo;
 import com.grgbanking.ct.http.UICallBackDao;
@@ -50,11 +55,23 @@ import com.hlct.framework.business.message.entity.PdaUserInfo;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import static com.grgbanking.ct.activity.Constants.FILE_PATH;
 import static com.grgbanking.ct.http.ResultInfo.CODE_GUARDMANIINFO;
@@ -65,11 +82,12 @@ import static com.grgbanking.ct.utils.LoginUtil.getManufacturer;
 
 public class LoginActivity extends Activity {
     private static String TAG = "LoginActivity";
+    private Context context;
     //获取当前时间戳
     String date = FileUtil.getDate();
     String flag;//登录的状态
-    String loginNameViewValue = null; //UI控件内容
-    String passwordViewValue = null;//UI控件内容
+    String loginNameViewValue = ""; //UI控件内容
+    String passwordViewValue = "";//UI控件内容
     List<NameValuePair> params = new ArrayList<>();
     TextView detail_branch_name;
     /**
@@ -95,7 +113,8 @@ public class LoginActivity extends Activity {
     private EditText loginNameView;
     private EditText passwordView;
     private CheckBox remPasswordView;
-    private Context context;
+    private CheckBox mDeletePXTask;
+    private boolean deletePxTask;
     private LoginUtil loginUtil;
     private String fileName;
     private com.hlct.framework.pda.common.entity.ResultInfo mResultInfo;
@@ -124,7 +143,29 @@ public class LoginActivity extends Activity {
                 case 0:
                     showUpdataDialog(arg0.getData().getString("address"));
                     break;
+                // 表示登陆失败
+                case 1:
+                    Toast.makeText(context, "用户名或密码错误", Toast.LENGTH_SHORT).show();
+                    loginButtonView.setText("登录");
+                    loginButtonView.setEnabled(true);
+                    break;
 
+                //  登陆成功 跳转到配箱页面  ResultInfo.CODE_PEIXIANG
+                case 3:
+                    success();
+                    Intent intent = new Intent();
+                    intent.setClass(LoginActivity.this, PeixiangActivity.class);
+                    startActivity(intent);
+                    finish();
+                    break;
+                //  登陆成功跳转到 出入库页面  ResultInfo.CODE_GUARDMANIINFO
+                case 4:
+                    success();
+                    Intent intent1 = new Intent();
+                    intent1.setClass(LoginActivity.this, NetOutInActivity.class);
+                    startActivity(intent1);
+                    finish();
+                    break;
                 default:
                     break;
             }
@@ -165,9 +206,21 @@ public class LoginActivity extends Activity {
                 passwordViewValue = passwordView.getText().toString();
                 DBManager dbManager = new DBManager(getApplicationContext());
                 dbManager.deleteNetTaskMsg();
-                if (getManufacturer().equals("alps")){//汉德霍尔机器登录
-                    wifiLogin();
-                }else {//荣瑞机器登录
+                //记住密码
+                if (remPasswordView.isChecked()) {
+                    loginUtil.setUserInfo(Constants.USER_NAME, loginNameViewValue);
+                    loginUtil.setUserInfo(Constants.PASSWORD, passwordViewValue);
+                    loginUtil.setUserInfo(Constants.ISSAVEPASS, true);
+                } else if (!remPasswordView.isChecked()) {
+                    loginUtil.setUserInfo(Constants.ISSAVEPASS, false);
+                }
+
+                if (getManufacturer().equals("alps")) {//汉德霍尔机器登录
+                    //标记是否删除之前的任务
+                    deletePxTask = mDeletePXTask.isChecked();
+                    //wifiLogin();
+                    netLogin();
+                } else {//荣瑞机器登录
                     //判断有无文件
                     boolean isExist = FileUtil.isExist(FILE_PATH + date + "WDRW.dat");
                     if (isExist) {//有
@@ -178,7 +231,7 @@ public class LoginActivity extends Activity {
                          */
                         mAsyncTask mAsyncTask = new mAsyncTask();
                         mAsyncTask.execute();
-                    }else {//无
+                    } else {//无
                         ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
                         showWaitingDialog(progressDialog, "提示", "未发现今日文件！", true);
                     }
@@ -187,28 +240,6 @@ public class LoginActivity extends Activity {
             }
 
         });
-
-        //        //记住密码操作
-        //        remPasswordView.setOnClickListener(new OnClickListener() {
-        //            @Override
-        //            public void onClick(View v) {
-        //
-        //            }
-        //        });
-        //
-        //        loginNameView.setOnClickListener(new OnClickListener() {
-        //            @Override
-        //            public void onClick(View v) {
-        //                loginNameView.setText("");
-        //            }
-        //        });
-        //
-        //        passwordView.setOnClickListener(new OnClickListener() {
-        //            @Override
-        //            public void onClick(View v) {
-        //                passwordView.setText("");
-        //            }
-        //        });
     }
 
     /**
@@ -245,6 +276,7 @@ public class LoginActivity extends Activity {
             Toast.makeText(context, "帐号密码有误,请重新输入", Toast.LENGTH_SHORT).show();
         }
     }
+
     /**
      * 使用wifi连接的情况下，访问后台服务器进行登录操作
      */
@@ -269,13 +301,6 @@ public class LoginActivity extends Activity {
         params.add(new BasicNameValuePair("login_name", loginNameViewValue));
         params.add(new BasicNameValuePair("login_password", passwordViewValue));
 
-        if (remPasswordView.isChecked()) {
-            loginUtil.setUserInfo(Constants.USER_NAME, loginNameViewValue);
-            loginUtil.setUserInfo(Constants.PASSWORD, passwordViewValue);
-            loginUtil.setUserInfo(Constants.ISSAVEPASS, true);
-        } else if (!remPasswordView.isChecked()) {
-            loginUtil.setUserInfo(Constants.ISSAVEPASS, false);
-        }
         //访问后台服务器进行登录操作
         Log.d(loginNameViewValue, passwordViewValue);
         new HttpPostUtils(Constants.URL_PDA_LOGIN, params, new UICallBackDao() {
@@ -283,7 +308,7 @@ public class LoginActivity extends Activity {
             public void callBack(ResultInfo resultInfo) {
                 Log.i(TAG, "use wifi to logining");
                 if (resultInfo.getCode() != null && !resultInfo.getCode().isEmpty()) {
-                    if (!resultInfo.getCode().equals("2")){
+                    if (!resultInfo.getCode().equals("2")) {
                         /** 开始组装数据*/
 
                         //取出所有数据
@@ -409,9 +434,9 @@ public class LoginActivity extends Activity {
                         intent.setClass(LoginActivity.this, PeixiangActivity.class);
                         startActivity(intent);
                         finish();
-                    }else {//如果账号密码错误
-                            Toast.makeText(context, resultInfo.getMessage(), Toast.LENGTH_SHORT).show();
-                            loginButtonView.setText("登录");
+                    } else {//如果账号密码错误
+                        Toast.makeText(context, resultInfo.getMessage(), Toast.LENGTH_SHORT).show();
+                        loginButtonView.setText("登录");
                     }
                 } else {
                     Toast.makeText(context, "无法获取任务信息", Toast.LENGTH_SHORT).show();
@@ -421,6 +446,94 @@ public class LoginActivity extends Activity {
             }
         }).execute();
     }
+
+    /**
+     * 汉德霍尔机器登陆
+     */
+    private void netLogin() {
+        ProgressDialog waitingDialog = new ProgressDialog(this);
+        String userName = loginNameView.getText().toString();
+        String password = passwordView.getText().toString();
+
+        if (StringTools.isEmpty(userName) || StringTools.isEmpty(password)) {
+            Toast.makeText(context, "用户名或密码不能为空！", Toast.LENGTH_LONG).show();
+            if (waitingDialog.isShowing()) {
+                waitingDialog.dismiss();
+            }
+        } else {
+            loginButtonView.setText("正在登录中...");
+            loginButtonView.setEnabled(false);
+            OkHttpClient client = new OkHttpClient();
+            RequestBody body = new FormBody.Builder()
+                    .add("login_name", userName)
+                    .add("login_password", password)
+                    .build();
+            Request request = new Request.Builder()
+                    .url(Constants.URL_PDA_LOGIN)
+                    .post(body)
+                    .build();
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    final String failureMessage = e.getMessage();
+                    Log.e(TAG, "onFailure: " + failureMessage);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show();
+                            loginButtonView.setText("登陆");
+                            loginButtonView.setEnabled(true);
+                        }
+                    });
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        String string = response.body().string();
+                        Log.e(TAG, "onResponse: body" + string);
+                        ResultInfo resultInfo = new ResultInfo();
+                        JSONObject jsonObject = null;
+                        try {
+                            jsonObject = new JSONObject(string);
+                            resultInfo.setCode(jsonObject.getString("code"));
+                            resultInfo.setMessage(jsonObject.getString("message"));
+                            PdaLoginMessage message = PdaLoginMessage.JSONtoPdaLoginMessage(jsonObject.getJSONObject("pdaLogMess"));
+                            resultInfo.setPdaLogMess(PdaLoginMessage.JSONtoPdaLoginMessage(jsonObject.getJSONObject("pdaLogMess")));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (resultInfo.getCode() != null && !resultInfo.getCode().isEmpty()) {
+                            saveMessageInDB(resultInfo);
+
+                            //押运人员
+                            if (ResultInfo.CODE_GUARDMANIINFO.equals(resultInfo.getCode())) {
+                                Message message = new Message();
+                                message.what = 4;
+                                handler.sendMessage(message);
+                            }
+                            //配箱人员
+                            else if (ResultInfo.CODE_PEIXIANG.equals(resultInfo.getCode())) {
+                                Message message = new Message();
+                                message.what = 3;
+                                handler.sendMessage(message);
+                            } else {//如果账号密码错误
+                                Message message = new Message();
+                                message.what = 2;
+                                handler.sendMessage(message);
+                            }
+                        }
+
+
+                    }
+                }
+            });
+
+        }
+
+    }
+
 
     /**
      * 超级管理员登陆
@@ -433,6 +546,7 @@ public class LoginActivity extends Activity {
                     Intent intent = new Intent();
                     intent.setClass(LoginActivity.this, NetOutInActivity.class);
                     startActivity(intent);
+                    finish();
                 }
                 count++;
             }
@@ -442,14 +556,19 @@ public class LoginActivity extends Activity {
     //findViewById.
     private void findViewById() {
         remPasswordView = (CheckBox) this.findViewById(R.id.cb);
+        mDeletePXTask = (CheckBox) findViewById(R.id.login_cb_if_delete_peixiang);
+        mDeletePXTask.setChecked(true);
+        if(!getManufacturer().equals("alps")){
+            mDeletePXTask.setVisibility(View.GONE);
+        }
         loginNameView = (EditText) this.findViewById(R.id.username_edit);
         passwordView = (EditText) this.findViewById(R.id.password_edit);
         loginButtonView = (Button) this.findViewById(R.id.login_button);
         detail_branch_name = (TextView) this.findViewById(R.id.detail_branch_name);
     }
 
-    /*
-     *初始化缓存，将缓存清空
+    /**
+     * 初始化缓存，将缓存清空
      */
     public void initCach() {
         DataCach.setPdaLoginMessage(null);
@@ -457,7 +576,7 @@ public class LoginActivity extends Activity {
 
     private void showUpdataDialog(final String url) {
         /** 当发现没有版本更新，则允许登录，否则 继续不可操作  */
-        loginButtonView.setEnabled(url == null ? true : false);
+        loginButtonView.setEnabled(url == null);
         /**显示当前版本 */
         //		try {
         //			detail_branch_name.setText("版本号:v"+getPackageManager().getPackageInfo(context.getPackageName(),0).versionName);
@@ -570,7 +689,7 @@ public class LoginActivity extends Activity {
         loginUser.setPassword(passwordViewValue);
         loginButtonView.setText("登录");
         loginButtonView.setEnabled(true);
-        Toast.makeText(context, "登录成功", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, "登录成功", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -764,14 +883,6 @@ public class LoginActivity extends Activity {
             params.add(new BasicNameValuePair("login_name", loginNameViewValue));
             params.add(new BasicNameValuePair("login_password", passwordViewValue));
 
-            if (remPasswordView.isChecked()) {
-                loginUtil.setUserInfo(Constants.USER_NAME, loginNameViewValue);
-                loginUtil.setUserInfo(Constants.PASSWORD, passwordViewValue);
-                loginUtil.setUserInfo(Constants.ISSAVEPASS, true);
-            } else if (!remPasswordView.isChecked()) {
-                loginUtil.setUserInfo(Constants.ISSAVEPASS, false);
-            }
-
             /** 判断机器类型 */
             network = getNetworkState(context);
             switch (network) {
@@ -799,5 +910,144 @@ public class LoginActivity extends Activity {
         }
     }
 
-    // TODO: 2017/10/9 根据设备的不同采用不同的登陆方式,(网络登陆)
+    /**
+     * 将从服务器获取的数据储存在 数据库中.
+     *
+     * @param resultInfo
+     */
+    private void saveMessageInDB(ResultInfo resultInfo) {
+
+        if (!resultInfo.getCode().equals("2")) {
+            //取出所有数据
+            PdaLoginMessage pdaLoginMessage = resultInfo.getPdaLogMess();
+            PdaLoginMsg pdaLoginMsg = new PdaLoginMsg();
+            //保存到缓存
+            pdaLoginMsg.setCode(pdaLoginMessage.getCode());
+            pdaLoginMsg.setPdaGuardManInfo(pdaLoginMessage.getGuardManInfoList());
+            pdaLoginMsg.setLineId(pdaLoginMessage.getLineId());
+            pdaLoginMsg.setLineSn(pdaLoginMessage.getLineSn());
+            pdaLoginMsg.setMsg(pdaLoginMessage.getMessage());
+            pdaLoginMsg.setNetInfoList(pdaLoginMessage.getNetInfoList());
+            pdaLoginMsg.setLineNotes(pdaLoginMessage.getLineNotes());
+            pdaLoginMsg.setAllPdaBoxsMap(pdaLoginMessage.getAllPdaBoxsMap());
+            pdaLoginMsg.setPdaUserInfo(pdaLoginMessage.getPdaLoginManInfo());
+
+            DataCach.setPdaLoginMsg(pdaLoginMsg);
+            Map<String, String> allPdaBoxsMap = pdaLoginMsg.getAllPdaBoxsMap();
+            DataCach.netType = CODE_GUARDMANIINFO;
+
+            //取出押运人员数据
+            List<PdaGuardManInfo> guardManInfoList = pdaLoginMessage.getGuardManInfoList();
+            if (guardManInfoList != null && guardManInfoList.size() > 0) {
+                for (PdaGuardManInfo info : guardManInfoList) {
+                    ConvoyManInfo manInfo = new ConvoyManInfo();
+                    manInfo.setGuardManId(info.getGuardManId());
+                    manInfo.setGuardManName(info.getGuardManName());
+                    manInfo.setGuardManRFID(info.getGuardManRFID());
+                    convoyManInfo.add(manInfo);
+                }
+                //存入数据库
+                DBManager dbmanager = new DBManager(context);
+                try {
+                    dbmanager.delete();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                dbmanager.addConvoyMan(convoyManInfo);
+            }
+            //取出网点信息
+            List<PdaNetInfo> netInfoList = pdaLoginMsg.getNetInfoList();
+            if (netInfoList != null && netInfoList.size() > 0) {
+                for (PdaNetInfo info : netInfoList) {
+                    NetInfo netInfo = new NetInfo();
+                    Extract extract = new Extract();
+                    ExtractBoxs extractBoxs = new ExtractBoxs();
+                    /*判断是出库还是入库决定存入哪张表*/
+                    if (info.getFlag().equals("1")) {
+                        extract.setLineSn(pdaLoginMsg.getLineSn());
+                        extract.setBankId(info.getBankId());
+                        extract.setNetTaskStatus(info.getNetTaskStatus());
+                        extract.setBankName(info.getBankName());
+                        extract.setLineId(pdaLoginMsg.getLineId());
+                        extract.setCashBoxInfoList(info.getCashBoxInfoList());
+                        extract.setNetPersonInfoList(info.getNetPersonInfoList());
+                        DBManager extractdb = new DBManager(context);
+                        extractdb.addExtract(extract);
+                    } else if (info.getFlag().equals("0")) {
+                        netInfo.setLineSn(pdaLoginMsg.getLineSn());
+                        netInfo.setBankId(info.getBankId());
+                        netInfo.setNetTaskStatus(info.getNetTaskStatus());
+                        netInfo.setBankName(info.getBankName());
+                        netInfo.setLineId(pdaLoginMsg.getLineId());
+                        netInfo.setNetPersonInfoList(info.getNetPersonInfoList());
+                        netInfo.setCashBoxInfoList(info.getCashBoxInfoList());
+                        netInfo.setFlag(info.getFlag());
+                        netInfos.add(netInfo);
+                    }
+                }
+                //存入数据库
+                DBManager manager = new DBManager(context);
+                manager.addNetInfo(netInfos);
+            }
+            //保存登录人员
+            List<PdaUserInfo> pdaUserInfo = pdaLoginMsg.getPdaUserInfo();
+            if (pdaUserInfo != null && pdaUserInfo.size() > 0) {
+                for (PdaUserInfo info : pdaUserInfo) {
+                    info.getFlag();
+                    info.getLine();
+                    info.getLogin_name();
+                    info.getLoginId();
+                    info.getLine();
+                    pdaUserInfos.add(info);
+                }
+                //存入数据库
+                DBManager loginDb = new DBManager(context);
+                loginDb.addLoginMan(pdaUserInfos);
+            }
+
+            //保存pda款箱
+            List<PdaCashboxInfo> pdaCashboxInfoList = pdaLoginMsg.getPdaCashboxInfo();
+            if (pdaCashboxInfoList != null && pdaCashboxInfoList.size() > 0) {
+                for (PdaCashboxInfo info : pdaCashboxInfoList) {
+                    CashBox cashBox = new CashBox();
+                    cashBox.setBankId(info.getBankId());
+                    cashBox.setBoxSn(info.getBoxSn());
+                    cashBox.setRfidNum(info.getRfidNum());
+                    cashBoxes.add(cashBox);
+                }
+                //存入数据库
+                DBManager cashBoxDB = new DBManager(context);
+                cashBoxDB.addCashBox(cashBoxes);
+            }
+
+            Map<String, String> bankPXMap = pdaLoginMessage.getBankPX();
+            if(deletePxTask){
+                //如果标记删除之前任务
+                if (bankPXMap != null && bankPXMap.size() > 0) {
+                    List<BankPX> bankPXList = new ArrayList<>();
+                    Iterator<String> iterator = bankPXMap.keySet().iterator();
+                    BankPX bankPX;
+                    while (iterator.hasNext()) {
+
+                        //接收到 json String 转成 bankPX类
+                        String str = bankPXMap.get(iterator.next());
+                        Gson gson = new Gson();
+                        bankPX = gson.fromJson(str, BankPX.class);
+                        Log.e(TAG, "saveMessageInDB: " + bankPX.toString());
+                        bankPXList.add(bankPX);
+                    }
+                    BankPXDao bankPXDao = GreenDaoManager.getInstance(context).getNewSession().getBankPXDao();
+                    bankPXDao.deleteAll();
+                    bankPXDao.insertInTx(bankPXList);
+                    BankTaskQRDao taskQRDao = GreenDaoManager.getInstance(context).getNewSession().getBankTaskQRDao();
+                    taskQRDao.deleteAll();
+                } else {
+                    BankPXDao bankPXDao = GreenDaoManager.getInstance(context).getNewSession().getBankPXDao();
+                    bankPXDao.deleteAll();
+                    BankTaskQRDao taskQRDao = GreenDaoManager.getInstance(context).getNewSession().getBankTaskQRDao();
+                    taskQRDao.deleteAll();
+                }
+            }//如果没有标记删除之前任务,不处理
+        }
+    }
 }

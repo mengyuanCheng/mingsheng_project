@@ -51,5 +51,6 @@
     <string name="save_data">保存数据</string>
     <string name="scan_QR_code">扫描二维码</string>
     <string name="QR_code_scan">二维码扫描</string>
+    <string name="checkBox_delete_PeiXiang">删除之前配箱任务</string>
 
 </resources>

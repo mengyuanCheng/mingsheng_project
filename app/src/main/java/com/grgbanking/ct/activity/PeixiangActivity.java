@@ -12,6 +12,8 @@ import android.widget.Toast;
 import com.grgbanking.ct.R;
 import com.grgbanking.ct.qcode.QcodeActivity;
 
+import static com.grgbanking.ct.utils.LoginUtil.getManufacturer;
+
 /**
  * Created by Administrator on 2016/7/13.
  */
@@ -19,10 +21,11 @@ import com.grgbanking.ct.qcode.QcodeActivity;
 
 public class PeixiangActivity extends Activity {
 
-    private Button PxButton;
-    private Button Pxback;
-    private Button StatButton;
-    private Button QRButton;
+    private Button mPxButton;
+    private Button mPxback;
+    private Button mStatButton;
+    private Button mQRButton;
+    private Button mBtnBankPeiXiang;
 
 
     @Override
@@ -31,12 +34,12 @@ public class PeixiangActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.peixiang);
 
-        PxButton = (Button) findViewById(R.id.peixiang_button);
-        Pxback = (Button) findViewById(R.id.net_sysout_view);
-//        StatButton = (Button) findViewById(R.id.stat_button);
-        QRButton = (Button) findViewById(R.id.QRCode_button);
-
-        PxButton.setOnClickListener(new View.OnClickListener() {
+        mPxButton = (Button) findViewById(R.id.peixiang_button);
+        mPxback = (Button) findViewById(R.id.net_sysout_view);
+        //        StatButton = (Button) findViewById(R.id.stat_button);
+        mQRButton = (Button) findViewById(R.id.QRCode_button);
+        mBtnBankPeiXiang = (Button) findViewById(R.id.bank_peixiang);
+        mPxButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
@@ -44,8 +47,7 @@ public class PeixiangActivity extends Activity {
                 startActivity(intent);
             }
         });
-
-        Pxback.setOnClickListener(new View.OnClickListener() {
+        mPxback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), LoginActivity.class));
@@ -53,28 +55,42 @@ public class PeixiangActivity extends Activity {
             }
         });
 
-//        StatButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent();
-//                intent.setClass(PeixiangActivity.this, StatActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+        //        StatButton.setOnClickListener(new View.OnClickListener() {
+        //            @Override
+        //            public void onClick(View v) {
+        //                Intent intent = new Intent();
+        //                intent.setClass(PeixiangActivity.this, StatActivity.class);
+        //                startActivity(intent);
+        //            }
+        //        });
 
-        QRButton.setOnClickListener(new View.OnClickListener() {
+        mQRButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClass(PeixiangActivity.this,SaveQRCodeActivity.class);
+                intent.setClass(PeixiangActivity.this, SaveQRCodeActivity.class);
                 startActivity(intent);
+            }
+        });
+        if (getManufacturer().equals("alps")) {
+            mBtnBankPeiXiang.setVisibility(View.VISIBLE);
+            mPxButton.setVisibility(View.GONE);
+        }else{
+            mBtnBankPeiXiang.setVisibility(View.GONE);
+            mPxButton.setVisibility(View.VISIBLE);
+        }
+
+        mBtnBankPeiXiang.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(PeixiangActivity.this, BankPeiXiangActivity.class));
             }
         });
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK&&event.getRepeatCount()==0) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
             Log.d("onKeyDown", "" + keyCode);
             exit();
             return true;
@@ -83,8 +99,11 @@ public class PeixiangActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
-    /** APP退出时间*/
+    /**
+     * APP退出时间
+     */
     private long mExitTime;
+
     private void exit() {
         if ((System.currentTimeMillis() - mExitTime) > 2000) {
             Toast.makeText(getApplicationContext(), "再按一次退出", Toast.LENGTH_SHORT).show();

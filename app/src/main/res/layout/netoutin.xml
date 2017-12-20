@@ -24,6 +24,7 @@
                 android:layout_height="35dp"
                 android:background="@drawable/shape"
                 android:gravity="center"
+                android:textColor="@color/white"
                 android:padding="10dp"
                 android:text="退出系统"
                 android:textSize="10sp"/>

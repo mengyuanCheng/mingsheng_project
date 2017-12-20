@@ -97,8 +97,7 @@ public class ScanActivity extends Activity {
             }
             showScanResult.setText(barcodeStr);
             if (mArrayList.contains(barcodeStr) || barcodeList.contains(barcodeStr)) {
-                Toast.makeText(ScanActivity.this, "扫描结果已经存在", Toast.LENGTH_SHORT).show();
-                return;
+                showScanResult.setText("扫描结果已经存在");
             } else {
                 barcodeList.add(barcodeStr);
                 mArrayList.add(barcodeStr);
@@ -350,6 +349,7 @@ public class ScanActivity extends Activity {
     private void bindScanService() {
         Intent intent = new Intent();
         intent.setAction("com.scan.service");//SCAN ACTION
+        intent.setPackage("com.pda.hwscan");
         bindService(intent, conn, Context.BIND_AUTO_CREATE);
     }
 
@@ -410,8 +410,6 @@ public class ScanActivity extends Activity {
                 //				}
             }
         }
-
-        ;
     };
     //start scan
     private void scan() {

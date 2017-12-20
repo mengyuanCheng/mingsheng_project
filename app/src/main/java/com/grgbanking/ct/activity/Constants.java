@@ -7,10 +7,10 @@ public class Constants {
     public static final String ISSAVEPASS = "savePassWord";//SharedPreferences的key用来获取状态
 
     //public  static final  String  BASE_SERVER_URL="http://183.63.190.43:6600/hbct"; //河北晨通正式服务器
-
     //	public  static final  String  BASE_SERVER_URL="http://183.63.190.43:6601/ycyt"; //宜昌宜通正式服务器
-    public static final String BASE_SERVER_URL = "http://192.168.1.101:8080/android_jkweb/"; //宜昌宜通正式服务器
-    //    public static final String BASE_SERVER_URL = "http://192.128.1.108/android_jkweb/"; //宜昌宜通正式服务器
+
+    //public static final String BASE_SERVER_URL = "http://195.25.0.112:8080/android_jkweb/"; //南京民生银行
+    public static final String BASE_SERVER_URL = "http://192.168.1.101:8080/android_jkweb/"; //本地测试
 
     //public  static final  String  BASE_SERVER_URL="http://10.2.18.32/hbct";  //本机测试
     //public  static final  String  BASE_SERVER_URL="http://192.168.2.102/hbct";  //本机测试
@@ -27,10 +27,13 @@ public class Constants {
      */
     public static final String URL_PDA_UPLOAD = BASE_SERVER_URL+"/mobile-message!UpdateNet.do";
     /**
+     * 网络提交BankID 对应的 peixiang  QR数据
+     */
+    public static final String URL_BANK_PX_NET_UPLOAD = BASE_SERVER_URL + "/mobile-message!UpdateBankPX.do";
+    /**
      * 网络提交peixiang数据
      */
     public static final String URL_PX_NET_UPLOAD = BASE_SERVER_URL + "/mobile-message!UpdatePX.do";
-
     /**
      * 网络提交peixiang数据
      */

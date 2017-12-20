@@ -16,6 +16,9 @@ public class MApplication extends Application {
     public static List<Object> activitys = new ArrayList<>();
     private static MApplication instance;
 
+    public MApplication() {
+    }
+
     /**
      * 获取单例模式中唯一的MyApplication实例
      */
@@ -24,6 +27,11 @@ public class MApplication extends Application {
             instance = new MApplication();
         }
         return instance;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
     }
 
     /**
@@ -47,4 +55,5 @@ public class MApplication extends Application {
         }
         System.exit(0);
     }
+
 }

@@ -6,8 +6,6 @@ import android.media.MediaPlayer;
 
 import com.grgbanking.ct.R;
 
-;
-
 /**
  * Created by lazylee on 2017/8/3.
  */

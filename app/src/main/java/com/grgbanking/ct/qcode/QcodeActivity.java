@@ -366,7 +366,7 @@ public class QcodeActivity extends Activity {
         String tmp = sb.toString().substring(0, sb.toString().length() - 1) + "]}";
         Log.i("====tmp==", "" + tmp);
 
-        if (flag == true) {
+        if (flag) {
             //将数据写入SD卡
             String date = FileUtil.getDate();
             String addr = FileUtil.createIfNotExist(FILE_PATH + FILE_NAME + date + FILE_FORMAT);

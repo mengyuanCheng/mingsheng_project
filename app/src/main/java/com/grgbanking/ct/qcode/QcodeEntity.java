@@ -52,7 +52,7 @@ public class QcodeEntity {
                 QcodeEntity qe = new QcodeEntity();
                 try {
                     qe.setBoxSN((String) jsonArray.getJSONObject(i).get("boxSN"));
-                    qe.setGuardName((String) jsonArray.getJSONObject(i).getString("guardName"));
+                    qe.setGuardName(jsonArray.getJSONObject(i).getString("guardName"));
                     qe.setStatus(jsonArray.getJSONObject(i).getString("status"));
                 } catch (JSONException e) {
                     e.printStackTrace();

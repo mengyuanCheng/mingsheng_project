@@ -237,11 +237,7 @@ public class FileUtil {
         // 获取扩展名
         String FileEnd = fName.substring(fName.lastIndexOf(".") + 1,
                 fName.length()).toLowerCase();
-        if (FileEnd.equals(type)) {
-            isImageFile = true;
-        } else {
-            isImageFile = false;
-        }
+        isImageFile = FileEnd.equals(type);
         return isImageFile;
     }
 

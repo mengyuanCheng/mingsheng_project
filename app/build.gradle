@@ -2,13 +2,15 @@ apply plugin: 'com.android.application'
 //使用greendao
 apply plugin: 'org.greenrobot.greendao'
 android {
-    compileSdkVersion 19
+    compileSdkVersion 22
     buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "com.grgbanking.ct"
+        versionCode 1
+        versionName "1.0"
         minSdkVersion 17
-        targetSdkVersion 19
+        targetSdkVersion 22
     }
 
     buildTypes {
@@ -21,12 +23,31 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+
+
+    // 打包后应用名称
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            def fileName
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                if (variant.buildType.name.equals('release')) {
+                    fileName = "hlct_release${defaultConfig.versionName}.${getTime()}.apk"
+                } else if (variant.buildType.name.equals('debug')) {
+                    fileName = "hlct_debug${defaultConfig.versionName}.${getTime()}.apk"
+                }
+                output.outputFile = new File(outputFile.parent, fileName)
+            }
+
+        }
+    }
+
 }
 //greendao配置
 greendao {
     //版本号，升级时可配置
     schemaVersion 1
-    daoPackage 'com.grgbanking.ct.database'
+    daoPackage 'com.grgbanking.ct.greendao'
     targetGenDir 'src/main/java'
 }
 
@@ -35,12 +56,16 @@ dependencies {
     compile files('libs/BaiduLBS_Android.jar')
     compile files('libs/UhfLib.jar')
     //greendao依赖
-    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.android.support:support-v4:22.2.1'
     compile 'io.github.openfeign:feign-gson:9.4.0'
-    compile 'com.android.support:appcompat-v7:19.1.0'
+    compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'org.greenrobot:greendao:3.2.0'
     compile files('libs/SerialPort.jar')
     compile files('libs/uhf_1_v1.0.jar')
-    compile files('libs/scanAidl.jar')
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
+    compile 'com.android.support:recyclerview-v7:22.2.1'
+}
+
+def getTime() {
+    return new Date().format("yyyyMMdd", TimeZone.getDefault());
 }

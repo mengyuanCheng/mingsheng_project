@@ -78,7 +78,7 @@ public class StatActivity extends Activity {
             public void callBack(ResultInfo resultInfo) {
                 Log.d("getCode", "" + resultInfo.getCode());
                 Log.d("getCode", "" + resultInfo.getMessage());
-                if (resultInfo.getCode().equals(resultInfo.CODE_SUCCESS)) {
+                if (resultInfo.getCode().equals(ResultInfo.CODE_SUCCESS)) {
                     //成功
                     JSONObject jsonObject = resultInfo.getJsonObject();
                     if (jsonObject != null && jsonObject.length() > 0) {
@@ -101,7 +101,7 @@ public class StatActivity extends Activity {
                         e.printStackTrace();
                     }
 
-                } else if (resultInfo.getCode().equals(resultInfo.CODE_ERROR)) {
+                } else if (resultInfo.getCode().equals(ResultInfo.CODE_ERROR)) {
                     Toast.makeText(getApplicationContext(), "刷新失败", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "未知错误", Toast.LENGTH_SHORT).show();

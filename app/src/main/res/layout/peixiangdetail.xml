@@ -117,10 +117,10 @@
         android:id="@+id/peixiang_ListView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/peixiangdetail_remark"
-        android:layout_below="@+id/textView1"
         android:divider="#F2F5F7"
-        android:dividerHeight="1dp"/>
+        android:dividerHeight="1dp"
+        android:layout_below="@+id/textView1"
+        android:layout_alignParentStart="true"/>
 
     <EditText
         android:id="@+id/peixiangdetail_remark"
