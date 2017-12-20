@@ -152,8 +152,6 @@ public class QcodeActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("position ----->", "" + position);
-                //TODO 判断要访问的数据是否存在QRCode_list,如果存在带着数据跳转
-
                 if (peiXiangInfos != null && peiXiangInfos.size() >= position + 1) {
                     PeiXiangInfo peiXiangInfo = peiXiangInfos.get(position);
                     Intent intent = new Intent(context, ScanQRCodeActivity.class);
@@ -389,7 +387,6 @@ public class QcodeActivity extends Activity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if(getManufacturer().equals("alps") && isNetworkConnected(context)){
-                                //TODO 上传生成的文件
                                 List<NameValuePair> params = new ArrayList<>();
                                 String date = FileUtil.getDate();
                                 String mResult=FileUtil.readTXT(FILE_PATH + FILE_NAME + date + FILE_FORMAT);
@@ -616,7 +613,6 @@ public class QcodeActivity extends Activity {
                         peiXiangInfo.setQR_codelist(list);
                     }
                     peiXiangInfo.setScanningDate(FileUtil.getDate());
-                    //TODO 在原来数组的位置上替换掉数组(更新数组)
                     peiXiangInfos.add(position, peiXiangInfo);
                     if (peiXiangInfos.size() > position + 1) {
                         peiXiangInfos.remove(position + 1);

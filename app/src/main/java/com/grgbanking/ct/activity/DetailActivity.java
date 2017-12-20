@@ -242,7 +242,6 @@ public class DetailActivity extends Activity {
                     }
                     break;
                 case R.id.Button01:
-                    // TODO: 2017/10/11
                     if (getManufacturer().equals("alps")) {
                         if (context.equals("启动扫描")) {
                             startFlag = true;

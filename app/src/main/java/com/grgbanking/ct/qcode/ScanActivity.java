@@ -157,12 +157,10 @@ public class ScanActivity extends Activity {
         super.onPause();
         if (getManufacturer().equals("alps")) {
             unregisterReceiver(keyReceiver);
-            //TODO
             unregisterReceiver(mScanReceiver);
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
             if (connFlag) {
@@ -171,7 +169,6 @@ public class ScanActivity extends Activity {
                     Log.e(TAG, "close----");
                     iScan.close();
                 } catch (RemoteException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 Log.e("Action ------->", "onPause Method running");
@@ -203,7 +200,6 @@ public class ScanActivity extends Activity {
             bindScanService();
             IntentFilter filter = new IntentFilter();
             filter.addAction("com.scan.RESULT");
-            //TODO
             registerReceiver(mScanReceiver, filter);
             //key receiver
             IntentFilter keyfilter = new IntentFilter();
@@ -288,7 +284,6 @@ public class ScanActivity extends Activity {
             @Override
             public void onClick(View arg0) {
                 if (getManufacturer().equals("alps")) {
-                    //TODO
                     mrunning = false;
                     /*if (scanTimer != null) {
                         scanTimer.cancel();
@@ -384,7 +379,6 @@ public class ScanActivity extends Activity {
                 iScan.enableSymbology(SymbologyID.SYM_HANXIN);//chinese hanxin
                 iScan.enableSymbology(SymbologyID.SYM_ALL);
             } catch (RemoteException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
@@ -401,7 +395,6 @@ public class ScanActivity extends Activity {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 //scan
@@ -419,7 +412,6 @@ public class ScanActivity extends Activity {
                 isRecved = true;
                 iScan.scan();
             } catch (RemoteException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
