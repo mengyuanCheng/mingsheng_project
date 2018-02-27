@@ -48,6 +48,34 @@ public class DBManager {
         }
     }
 
+    public void deleteTaskInfo(String bankId, String time, String netType) {
+        db = helper.getWritableDatabase();
+        db.execSQL("DELETE FROM TaskInfo where bankID = " + bankId + " and time = " + time + " and netType = "
+                + netType + ";");
+        db.close();
+    }
+
+
+    public List<TaskInfo> queryTaskInfo(String bankID, String time, String netType) {
+        db = helper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM TaskInfo where bankID = ? and time = ? and netType = ?",
+                new String[]{bankID,time,netType});
+        List<TaskInfo> list = new ArrayList<>();
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    TaskInfo t = new TaskInfo();
+                    t.setBankID(c.getString(0));
+                    t.setTime(c.getString(1));
+                    t.setStatus(c.getString(2));
+                    t.setNetType(c.getString(3));
+                    list.add(t);
+                } while (c.moveToNext());
+            }
+        }
+        return list;
+    }
+
     /**
      * @param bankID 网点ID
      * @return
@@ -866,12 +894,12 @@ public class DBManager {
     /**
      * 清除任务信息
      */
-    public void deleteNetTaskMsg(){
+    public void deleteNetTaskMsg() {
         try {
-            db=helper.getWritableDatabase();
-            db.delete(DBHelper.TABLE_PdaNetInfo_NAME,null,null);
-            db.delete(DBHelper.TABLE_EXTRACT_NAME,null,null);
-        }catch (Exception e){
+            db = helper.getWritableDatabase();
+            db.delete(DBHelper.TABLE_PdaNetInfo_NAME, null, null);
+            db.delete(DBHelper.TABLE_EXTRACT_NAME, null, null);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

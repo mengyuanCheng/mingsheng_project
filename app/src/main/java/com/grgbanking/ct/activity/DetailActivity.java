@@ -61,6 +61,7 @@ import static com.grgbanking.ct.activity.Constants.FILE_NAME_OUT;
 import static com.grgbanking.ct.activity.Constants.FILE_PATH;
 import static com.grgbanking.ct.activity.Constants.NET_COMMIT_TYPE_IN;
 import static com.grgbanking.ct.activity.Constants.NET_COMMIT_TYPE_OUT;
+import static com.grgbanking.ct.cach.DataCach.netType;
 import static com.grgbanking.ct.cach.DataCach.pdaLoginMsg;
 import static com.grgbanking.ct.utils.LoginUtil.getManufacturer;
 
@@ -801,6 +802,7 @@ public class DetailActivity extends Activity {
                             tk.setNetType("1");
                             tk.setStatus("0");
                             tk.setTime(date1);
+                            db.deleteTaskInfo(recordnet.getBankId(),date1,"1");
                             db.addTaskInfo(tk);
                         }
                         commitNoButton.setEnabled(false);
@@ -832,6 +834,7 @@ public class DetailActivity extends Activity {
                             tk.setNetType("0");
                             tk.setStatus("0");
                             tk.setTime(date1);
+                            db.deleteTaskInfo(recordnet.getBankId(),date1,"0");
                             db.addTaskInfo(tk);
                         }
                         commitNoButton.setEnabled(false);

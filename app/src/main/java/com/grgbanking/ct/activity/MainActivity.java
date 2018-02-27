@@ -56,10 +56,13 @@ import static com.grgbanking.ct.activity.Constants.FILE_FORMAT;
 import static com.grgbanking.ct.activity.Constants.FILE_NAME_IN;
 import static com.grgbanking.ct.activity.Constants.FILE_NAME_OUT;
 import static com.grgbanking.ct.activity.Constants.FILE_PATH;
+import static com.grgbanking.ct.cach.DataCach.loginUser;
 import static com.grgbanking.ct.cach.DataCach.netType;
 import static com.grgbanking.ct.utils.FileUtil.ConversionDate;
 
 public class MainActivity extends Activity {
+
+    private static final String TAG = "MainActivity";
     private PopupMenu popupMenu;
     private Menu menu;
     private ListView listView;
@@ -210,17 +213,17 @@ public class MainActivity extends Activity {
             public void onClick(DialogInterface dialog, int which) {
                 List<NameValuePair> params = new ArrayList<>();
                 String date = FileUtil.getDate();
-                String mResult="";
-                if (mainTitle.getText().toString().equals("网点入库任务列表")){
-                    mResult =FileUtil.readTXT(FILE_PATH + FILE_NAME_IN + date + FILE_FORMAT);
-                }else if (mainTitle.getText().toString().equals("网点出库任务列表")){
-                    mResult =FileUtil.readTXT(FILE_PATH + FILE_NAME_OUT + date + FILE_FORMAT);
+                String mResult = "";
+                if (mainTitle.getText().toString().equals("网点入库任务列表")) {
+                    mResult = FileUtil.readTXT(FILE_PATH + FILE_NAME_IN + date + FILE_FORMAT);
+                } else if (mainTitle.getText().toString().equals("网点出库任务列表")) {
+                    mResult = FileUtil.readTXT(FILE_PATH + FILE_NAME_OUT + date + FILE_FORMAT);
                 }
                 params.add(new BasicNameValuePair("content", mResult));
                 new HttpPostUtils(Constants.URL_PDA_UPLOAD, params, new UICallBackDao() {
                     @Override
                     public void callBack(ResultInfo resultInfo) {
-                        Toast.makeText(getApplicationContext(),resultInfo.getMessage(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), resultInfo.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 }).execute();
             }
@@ -437,13 +440,22 @@ public class MainActivity extends Activity {
      * @return true是已完成 false是未完成
      */
     private boolean getTaskStatus(String netType, String bankId) {
-        boolean flag = false;
         List<TaskInfo> tkList = new ArrayList<>();
         DBManager db = new DBManager(getApplicationContext());
-        try {
-            tkList = db.queryTaskInfo(bankId);
-            for (int i = 0; i < tkList.size(); i++) {
+        String time = FileUtil.getDate();
+
+        tkList = db.queryTaskInfo(bankId, time, netType);
+        if (tkList == null || tkList.size() == 0) {
+            return false;
+        } else {
+            Log.e(TAG, "getTaskStatus: " + tkList.size());
+            return tkList.get(0).getStatus().equals("0");
+        }
+
+            /*for (int i = 0; i < tkList.size(); i++) {
                 FileUtil f = new FileUtil();
+                Log.e("任务日期", "getTaskStatus: " +tkList.get(i).getTime());
+                String date = tkList.get(i).getTime();
                 boolean b = FileUtil.areSameDay(ConversionDate(tkList.get(i).getTime()),
                         new Date(System.currentTimeMillis()));
                 if (b) {
@@ -451,12 +463,7 @@ public class MainActivity extends Activity {
                 } else {
                     return flag;
                 }
-            }
-            return flag;
-        } catch (Exception e) {
-            return flag;
-        }
-
+            }*/
     }
 
     /**

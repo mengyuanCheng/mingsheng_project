@@ -124,7 +124,7 @@ public class LoginActivity extends Activity {
         @SuppressLint("SdCardPath")
         @Override
         public void onReceive(Context context, Intent intent) {
-            /** 判断 是否是当前操作的下载ID，有可能是其它应用下载成功的回调*/
+            /* 判断 是否是当前操作的下载ID，有可能是其它应用下载成功的回调*/
             if (downLoadId == intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0)) {
                 String path = "/sdcard/ct/ct.apk";
                 File appFile = new File(path);
